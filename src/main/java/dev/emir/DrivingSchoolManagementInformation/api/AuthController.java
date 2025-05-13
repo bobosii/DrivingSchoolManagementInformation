@@ -1,7 +1,7 @@
 package dev.emir.DrivingSchoolManagementInformation.api;
 
 import dev.emir.DrivingSchoolManagementInformation.models.User;
-import dev.emir.DrivingSchoolManagementInformation.dto.response.JwtResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.AuthResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.LoginRequest;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.security.JwtUtil;
@@ -40,6 +40,30 @@ public class AuthController {
                         user.getUsername(), user.getPassword(),
                         Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))));
 
-        return ResponseEntity.ok(new JwtResponse(token));
+        Long linkedEntityId = null;
+        switch (user.getRole()) {
+            case STUDENT -> {
+                if (user.getStudent() != null)
+                    linkedEntityId = user.getStudent().getId();
+            }
+            case INSTRUCTOR -> {
+                if (user.getInstructor() != null)
+                    linkedEntityId = user.getInstructor().getId();
+            }
+            case EMPLOYEE -> {
+                if (user.getEmployee() != null)
+                    linkedEntityId = user.getEmployee().getId();
+            }
+            default -> {
+            }
+        }
+
+        return ResponseEntity.ok(new AuthResponse(
+                token,
+                user.getUsername(),
+                user.getRole().name(),
+                user.getId(),
+                linkedEntityId
+        ));
     }
 }

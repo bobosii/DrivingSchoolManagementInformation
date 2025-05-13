@@ -5,6 +5,8 @@ import dev.emir.DrivingSchoolManagementInformation.dao.TermRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.StudentProfileDTO;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.StudentRegisterRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.models.Student;
 import dev.emir.DrivingSchoolManagementInformation.models.Term;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
@@ -62,36 +64,43 @@ public class StudentController {
 
     @PostMapping("/register")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<?> registerStudent(@RequestBody StudentRegisterRequest request){
-        if (userRepository.findByUsername(request.getUsername()).isPresent()){
-            return ResponseEntity.badRequest().body("Username already exist");
+    public ResponseEntity<ApiResponse<StudentRegisterResponse>> registerStudent(@RequestBody StudentRegisterRequest request) {
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().build();
         }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole(Role.STUDENT);
-        userRepository.save(user);
 
-        Term term = null;
-        if (request.getTermId() != null){
-            term = termRepository.findById(request.getTermId()).orElse(null);
-        }
+        Term term = termRepository.findById(request.getTermId())
+                .orElseThrow(() -> new RuntimeException("Term not found"));
 
         Student student = new Student();
-        student.setUser(user);
         student.setFirstName(request.getFirstName());
         student.setLastName(request.getLastName());
         student.setEmail(request.getEmail());
         student.setBirthDate(request.getBirthDate());
         student.setTerm(term);
-
-        studentRepository.save(student);
+        student.setUser(user);
 
         user.setStudent(student);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return ResponseEntity.ok("Student registered successfully");
+        StudentRegisterResponse responseData = new StudentRegisterResponse(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                savedUser.getUsername(),
+                savedUser.getRole().name(),
+                term.getId()
+        );
+
+        ApiResponse<StudentRegisterResponse> response = new ApiResponse<>(true,"Student registered successfully",responseData);
+
+        return ResponseEntity.ok(response);
     }
 
 }
