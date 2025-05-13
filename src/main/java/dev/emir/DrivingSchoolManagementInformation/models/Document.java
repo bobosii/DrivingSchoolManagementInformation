@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "document")
 public class Document {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String type;
     private String filePath;

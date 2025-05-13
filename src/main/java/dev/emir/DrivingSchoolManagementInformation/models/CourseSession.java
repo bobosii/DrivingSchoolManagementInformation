@@ -9,6 +9,7 @@ import java.util.List;
 @Table(name = "course_session")
 public class CourseSession {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

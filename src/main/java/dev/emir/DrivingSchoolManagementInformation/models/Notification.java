@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Table(name = "notification")
 public class Notification {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;

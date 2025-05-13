@@ -8,6 +8,7 @@ import java.util.List;
 @Table(name = "appointment_type")
 public class AppointmentType {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 

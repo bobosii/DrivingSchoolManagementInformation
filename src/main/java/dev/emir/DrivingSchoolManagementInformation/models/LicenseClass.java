@@ -8,6 +8,7 @@ import java.util.List;
 @Table(name = "license_class")
 public class LicenseClass {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String code;
     private String description;

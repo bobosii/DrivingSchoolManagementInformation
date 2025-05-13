@@ -9,6 +9,7 @@ import java.util.List;
 @Table(name = "vehicle")
 public class Vehicle {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String plate;
     private boolean automatic;

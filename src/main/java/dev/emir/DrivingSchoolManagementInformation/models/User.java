@@ -1,5 +1,7 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.emir.DrivingSchoolManagementInformation.models.enums.Role;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;

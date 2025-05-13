@@ -10,7 +10,9 @@ import java.util.List;
 @Table(name = "term")
 public class Term {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
     private LocalDate startDate;
     private LocalDate endDate;
     private int quota;
@@ -18,14 +20,24 @@ public class Term {
     @OneToMany(mappedBy = "term")
     private List<Student> students;
 
-    public Term(){}
+    public Term(){
+    }
 
-    public Term(Long id, LocalDate startDate, LocalDate endDate, int quota, List<Student> students) {
+    public Term(Long id, String name, LocalDate startDate, LocalDate endDate, int quota, List<Student> students) {
         this.id = id;
+        this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.quota = quota;
         this.students = students;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Long getId() {

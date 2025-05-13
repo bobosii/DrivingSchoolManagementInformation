@@ -9,6 +9,7 @@ import java.util.List;
 @Table(name = "simulator_session")
 public class SimulatorSession {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime sessionDate;
     private int durationMinutes;

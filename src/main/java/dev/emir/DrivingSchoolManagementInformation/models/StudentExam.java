@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "student_exam")
 public class StudentExam {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int score;
     private boolean passed;

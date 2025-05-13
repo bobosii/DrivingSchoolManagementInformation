@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Table(name = "appointment")
 public class Appointment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDate date;
     private String status;
