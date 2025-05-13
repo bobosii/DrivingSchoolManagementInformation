@@ -6,7 +6,9 @@ import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.StudentProfileDTO;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.StudentRegisterRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
-import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentRegisterResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentRegisterResponse;
+import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ProfileResponseMapper;
 import dev.emir.DrivingSchoolManagementInformation.models.Student;
 import dev.emir.DrivingSchoolManagementInformation.models.Term;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
@@ -37,30 +39,6 @@ public class StudentController {
         this.passwordEncoder = passwordEncoder;
         this.termRepository = termRepository;
     }
-
-
-    @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/profile")
-    public ResponseEntity<StudentProfileDTO> getStudentProfile(Authentication authentication){
-        String username = authentication.getName();
-
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        Student student = studentRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        StudentProfileDTO dto = new StudentProfileDTO(
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getBirthDate(),
-                student.getTerm() != null ? student.getTerm().getName() : null
-        );
-
-        return ResponseEntity.ok(dto);
-    }
-
 
     @PostMapping("/register")
     @PreAuthorize("permitAll()")
@@ -99,6 +77,23 @@ public class StudentController {
         );
 
         ApiResponse<StudentRegisterResponse> response = new ApiResponse<>(true,"Student registered successfully",responseData);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<StudentProfileResponse>> getStudentProfile(Authentication authentication){
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username).
+                orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Student student = studentRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        StudentProfileResponse profile = ProfileResponseMapper.toStudentProfile(student,user);
+        ApiResponse<StudentProfileResponse> response = new ApiResponse<>(true,"Profil bilgileri basariyla getirildi",profile);
 
         return ResponseEntity.ok(response);
     }

@@ -1,32 +1,22 @@
-package dev.emir.DrivingSchoolManagementInformation.dto.response;
+package dev.emir.DrivingSchoolManagementInformation.dto.response.instructor;
 
-public class StudentRegisterResponse {
+public class InstructorRegisterResponse {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private String username;
     private String role;
-    private Long termId;
 
-    public StudentRegisterResponse(){}
+    public InstructorRegisterResponse(){}
 
-    public StudentRegisterResponse(Long id, String firstName, String lastName, String email, String username, String role, Long termId) {
+    public InstructorRegisterResponse(Long id, String firstName, String lastName, String email, String username, String role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.username = username;
         this.role = role;
-        this.termId = termId;
-    }
-
-    public Long getTermId() {
-        return termId;
-    }
-
-    public void setTermId(Long termId) {
-        this.termId = termId;
     }
 
     public Long getId() {

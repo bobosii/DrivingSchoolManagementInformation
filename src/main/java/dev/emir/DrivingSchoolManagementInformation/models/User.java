@@ -27,10 +27,10 @@ public class User implements UserDetails {
     @OneToOne(mappedBy = "user")
     private Student student;
 
-    @OneToOne
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Instructor instructor;
 
-    @OneToOne
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Employee employee;
 
     public User(){}

@@ -1,20 +1,29 @@
-package dev.emir.DrivingSchoolManagementInformation.dto.response;
+package dev.emir.DrivingSchoolManagementInformation.dto.response.student;
 
-public class InstructorRegisterResponse {
+import dev.emir.DrivingSchoolManagementInformation.models.Term;
+
+import java.time.LocalDate;
+
+public class StudentProfileResponse {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
+    private LocalDate birthDate;
+    private String termName;
     private String username;
     private String role;
 
-    public InstructorRegisterResponse(){}
+    public StudentProfileResponse() {
+    }
 
-    public InstructorRegisterResponse(Long id, String firstName, String lastName, String email, String username, String role) {
+    public StudentProfileResponse(Long id, String firstName, String lastName, String email, LocalDate birthDate, String termName, String username, String role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.birthDate = birthDate;
+        this.termName = termName;
         this.username = username;
         this.role = role;
     }
@@ -49,6 +58,22 @@ public class InstructorRegisterResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getTermName() {
+        return termName;
+    }
+
+    public void setTermName(String termName) {
+        this.termName = termName;
     }
 
     public String getUsername() {

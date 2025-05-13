@@ -5,9 +5,8 @@ import dev.emir.DrivingSchoolManagementInformation.dao.InstructorRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.EmployeeRegisterRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.InstructorRegisterRequest;
-import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
-import dev.emir.DrivingSchoolManagementInformation.dto.response.EmployeeRegisterResponse;
-import dev.emir.DrivingSchoolManagementInformation.dto.response.InstructorRegisterResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.employee.EmployeeRegisterResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.InstructorRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.models.Employee;
 import dev.emir.DrivingSchoolManagementInformation.models.Instructor;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
@@ -50,6 +49,7 @@ public class AdminController {
         instructor.setLastName(request.getLastName());
         instructor.setEmail(request.getEmail());
         instructor.setBirthDate(request.getBirthDate());
+        instructor.setCertificationNo(request.getCertificationNo());
         instructor.setUser(user);
 
         user.setInstructor(instructor);
