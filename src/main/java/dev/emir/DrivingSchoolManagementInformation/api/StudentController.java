@@ -3,7 +3,6 @@ package dev.emir.DrivingSchoolManagementInformation.api;
 import dev.emir.DrivingSchoolManagementInformation.dao.StudentRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.TermRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
-import dev.emir.DrivingSchoolManagementInformation.dto.StudentProfileDTO;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.StudentRegisterRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;

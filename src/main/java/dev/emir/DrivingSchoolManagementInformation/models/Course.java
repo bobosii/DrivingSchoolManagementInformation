@@ -1,5 +1,6 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
+import dev.emir.DrivingSchoolManagementInformation.models.enums.CourseType;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -12,15 +13,28 @@ public class Course {
     private Long id;
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    private CourseType courseType;
+
     @OneToMany(mappedBy = "course")
     private List<CourseSession> sessions;
 
     public Course(){}
 
-    public Course(Long id, String name, List<CourseSession> sessions) {
+
+    public Course(Long id, String name, List<CourseSession> sessions, CourseType courseType) {
         this.id = id;
         this.name = name;
         this.sessions = sessions;
+        this.courseType = courseType;
+    }
+
+    public CourseType getCourseType() {
+        return courseType;
+    }
+
+    public void setCourseType(CourseType courseType) {
+        this.courseType = courseType;
     }
 
     public Long getId() {
