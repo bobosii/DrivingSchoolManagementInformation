@@ -80,6 +80,21 @@ public class StudentCourseSessionService {
         return studentCourseSessionRepository.save(courseSession);
     }
 
-    
+    public StudentCourseSession approveAppointment(Long appointmentId, Long approverId){
+        StudentCourseSession session = studentCourseSessionRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment Not found"));
+
+        if (session.isApproved()){
+            throw new RuntimeException("This appointment is already approved");
+        }
+
+        User approver = userRepository.findById(approverId)
+                .orElseThrow(() -> new RuntimeException("Approver not found"));
+
+        session.setApproved(true);
+        session.setAssignedBy(approver);
+
+        return studentCourseSessionRepository.save(session);
+    }
 
 }
