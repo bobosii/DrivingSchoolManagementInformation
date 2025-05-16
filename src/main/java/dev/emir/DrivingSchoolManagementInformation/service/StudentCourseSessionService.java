@@ -57,4 +57,29 @@ public class StudentCourseSessionService {
         return studentCourseSessionRepository.save(studentCourseSession);
     }
 
+    public StudentCourseSession createAppointment(Long studentId, Long courseSessionId){
+        CourseSession session = this.courseSessionRepository.findById(courseSessionId)
+                .orElseThrow(() -> new RuntimeException("Session not found"));
+
+        CourseType courseType = session.getCourse().getCourseType();
+
+        if (courseType != CourseType.SIMULATION && courseType != CourseType.DRIVING){
+            throw new RuntimeException("Only simulation or driving lessons require appointment");
+        }
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        StudentCourseSession courseSession = new StudentCourseSession();
+        courseSession.setStudent(student);
+        courseSession.setCourseSession(session);
+        courseSession.setAssignedBy(null);
+        courseSession.setApproved(false);
+        courseSession.setAssignedAt(LocalDateTime.now());
+
+        return studentCourseSessionRepository.save(courseSession);
+    }
+
+    
+
 }

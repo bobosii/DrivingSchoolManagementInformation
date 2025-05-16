@@ -1,4 +1,4 @@
-package dev.emir.DrivingSchoolManagementInformation.dto.request;
+package dev.emir.DrivingSchoolManagementInformation.dto.request.student;
 
 import java.time.LocalDate;
 
