@@ -5,12 +5,17 @@ import dev.emir.DrivingSchoolManagementInformation.dao.InstructorRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.EmployeeRegisterRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.InstructorRegisterRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.request.course.CreateCourseRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.employee.EmployeeRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.InstructorRegisterResponse;
+import dev.emir.DrivingSchoolManagementInformation.models.Course;
 import dev.emir.DrivingSchoolManagementInformation.models.Employee;
 import dev.emir.DrivingSchoolManagementInformation.models.Instructor;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
 import dev.emir.DrivingSchoolManagementInformation.models.enums.Role;
+import dev.emir.DrivingSchoolManagementInformation.service.CourseService;
+import dev.emir.DrivingSchoolManagementInformation.service.CourseSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,12 +33,15 @@ public class AdminController {
     private final EmployeeRepository employeeRepository;
     @Autowired
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private final CourseService courseService;
 
-    public AdminController(UserRepository userRepository, InstructorRepository instructorRepository, EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
+    public AdminController(UserRepository userRepository, InstructorRepository instructorRepository, EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder, CourseService courseService, CourseSessionService courseSessionService) {
         this.userRepository = userRepository;
         this.instructorRepository = instructorRepository;
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
+        this.courseService = courseService;
     }
 
     @PostMapping("/register/instructor")
@@ -101,6 +109,14 @@ public class AdminController {
     @GetMapping("/dashboard")
     public ResponseEntity<String> adminPanel() {
         return ResponseEntity.ok("Admin paneline hoş geldiniz.");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/course/create")
+    public ResponseEntity<ApiResponse<Course>> createCourse(@RequestBody CreateCourseRequest request){
+        Course created = courseService.createCourse(request.getName(),request.getCourseType());
+        ApiResponse<Course> response = new ApiResponse<>(true,"Course created successfully",created);
+        return ResponseEntity.ok(response);
     }
 
 

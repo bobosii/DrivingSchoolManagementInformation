@@ -1,12 +1,11 @@
 package dev.emir.DrivingSchoolManagementInformation.helper.profileMapper;
 
+import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.employee.EmployeeProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.InstructorProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;
-import dev.emir.DrivingSchoolManagementInformation.models.Employee;
-import dev.emir.DrivingSchoolManagementInformation.models.Instructor;
-import dev.emir.DrivingSchoolManagementInformation.models.Student;
-import dev.emir.DrivingSchoolManagementInformation.models.User;
+import dev.emir.DrivingSchoolManagementInformation.models.*;
 
 public class ProfileResponseMapper {
 
@@ -45,5 +44,17 @@ public class ProfileResponseMapper {
                 user.getRole().name(),
                 user.getUsername()
         );
+    }
+    public static ApiResponse<CourseSessionResponse> getCourseSessionResponse(CourseSession created) {
+        CourseSessionResponse responseData = new CourseSessionResponse(
+                created.getId(),
+                created.getCourse().getName(),
+                created.getInstructor().getFirstName() + " " + created.getInstructor().getLastName(),
+                created.getClassroom().getName(),
+                created.getStartTime(),
+                created.getEndTime()
+        );
+        ApiResponse<CourseSessionResponse> response = new ApiResponse<>(true,"Course sesion created successfully",responseData);
+        return response;
     }
 }

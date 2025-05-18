@@ -41,7 +41,7 @@ public class AppointmentApprovalController {
         );
 
         ApiResponse<StudentCourseSessionResponse> response =
-                new ApiResponse<>(true,"Appoitment approved successfully",responseData);
+                new ApiResponse<>(true,"Appointment approved successfully",responseData);
 
         return ResponseEntity.ok(response);
     }
