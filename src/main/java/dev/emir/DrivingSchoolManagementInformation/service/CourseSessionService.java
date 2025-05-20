@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class CourseSessionService {
@@ -56,5 +57,28 @@ public class CourseSessionService {
         courseSession.setInstructor(instructor);
 
         return courseSessionRepository.save(courseSession);
+    }
+
+    public List<CourseSession> getAllCourseSessions() {
+        return courseSessionRepository.findAll();
+    }
+
+    public CourseSession getCourseSessionById(Long id) {
+        return courseSessionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Course Session not found"));
+    }
+
+    public CourseSession updateCourseSession(Long id, CourseSession courseSession) {
+        CourseSession existingCourseSession = getCourseSessionById(id);
+        existingCourseSession.setCourse(courseSession.getCourse());
+        existingCourseSession.setStartTime(courseSession.getStartTime());
+        existingCourseSession.setEndTime(courseSession.getEndTime());
+        existingCourseSession.setClassroom(courseSession.getClassroom());
+        existingCourseSession.setInstructor(courseSession.getInstructor());
+        return courseSessionRepository.save(existingCourseSession);
+    }
+
+    public void deleteCourseSession(Long id) {
+        courseSessionRepository.deleteById(id);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class TermService {
@@ -23,5 +24,29 @@ public class TermService {
         term.setEndDate(endDate);
         term.setQuota(quota);
         return termRepository.save(term);
+    }
+
+    public List<Term> getAllTerms() {
+        return termRepository.findAll();
+    }
+
+    public Term getTermById(Long id) {
+        return termRepository.findById(id).orElse(null);
+    }
+
+    public Term updateTerm(Long id, Term term) {
+        Term existingTerm = termRepository.findById(id).orElse(null);
+        if (existingTerm != null) {
+            existingTerm.setName(term.getName());
+            existingTerm.setStartDate(term.getStartDate());
+            existingTerm.setEndDate(term.getEndDate());
+            existingTerm.setQuota(term.getQuota());
+            return termRepository.save(existingTerm);
+        }
+        return null;
+    }
+
+    public void deleteTerm(Long id) {
+        termRepository.deleteById(id);
     }
 }

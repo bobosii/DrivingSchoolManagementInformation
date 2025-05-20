@@ -13,6 +13,7 @@ public class CourseSession {
     private Long id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private int capacity;
 
     @ManyToOne
     private Course course;
@@ -24,18 +25,19 @@ public class CourseSession {
     private Instructor instructor;
 
     @ManyToMany(mappedBy = "courseSessions")
-    private List<Student> students;
+    private List<Student> enrolledStudents;
 
     public CourseSession(){}
 
-    public CourseSession(Long id, LocalDateTime startTime, LocalDateTime endTime, Course course, Classroom classroom, Instructor instructor, List<Student> students) {
+    public CourseSession(Long id, LocalDateTime startTime, LocalDateTime endTime, int capacity, Course course, Classroom classroom, Instructor instructor, List<Student> enrolledStudents) {
         this.id = id;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.capacity = capacity;
         this.course = course;
         this.classroom = classroom;
         this.instructor = instructor;
-        this.students = students;
+        this.enrolledStudents = enrolledStudents;
     }
 
     public Long getId() {
@@ -62,6 +64,14 @@ public class CourseSession {
         this.endTime = endTime;
     }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
     public Course getCourse() {
         return course;
     }
@@ -86,11 +96,11 @@ public class CourseSession {
         this.instructor = instructor;
     }
 
-    public List<Student> getStudents() {
-        return students;
+    public List<Student> getEnrolledStudents() {
+        return enrolledStudents;
     }
 
-    public void setStudents(List<Student> students) {
-        this.students = students;
+    public void setEnrolledStudents(List<Student> enrolledStudents) {
+        this.enrolledStudents = enrolledStudents;
     }
 }

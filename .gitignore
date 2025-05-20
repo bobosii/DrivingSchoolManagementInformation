@@ -6,6 +6,15 @@ target/
 mvnw
 mvnw.cmd
 
+
+## Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/coverage/
+
 ### STS ###
 .apt_generated
 .classpath
