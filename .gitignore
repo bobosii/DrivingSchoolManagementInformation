@@ -107,3 +107,19 @@ bin/
 
 ### BlueJ ###
 *.ctxt
+# === .env files ===
+.env
+.env.local
+
+# === === ===
+
+# === React + Vite Frontend ===
+/frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*.local
+frontend/.DS_Store
+
+# === npm ===
+frontend/package-lock.json
