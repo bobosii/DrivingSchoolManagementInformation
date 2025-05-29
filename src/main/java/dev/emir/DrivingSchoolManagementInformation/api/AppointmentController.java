@@ -8,12 +8,16 @@ import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.AppointmentResponse;
 import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
 import dev.emir.DrivingSchoolManagementInformation.models.Appointment;
+import dev.emir.DrivingSchoolManagementInformation.models.enums.AppointmentStatus;
 import dev.emir.DrivingSchoolManagementInformation.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,5 +109,30 @@ public class AppointmentController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new ApiResponse<>(true,"Appointments successfully listed by instructor id",appointmentResponses));
+    }
+
+    @GetMapping("between")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointmentsBetweenDates(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam("end")@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end
+            ){
+        List<Appointment> appointments = appointmentService.getAppointmentsBetweenDates(start,end);
+        List<AppointmentResponse> appointmentResponses = appointments.stream()
+                .map(ModelMappings::toAppointmentResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new ApiResponse<>(true,"Appointments between dates fetched",appointmentResponses));
+    }
+
+    @GetMapping("/status")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAppointmentByStatus(
+            @RequestParam("status")AppointmentStatus status
+            ){
+        List<Appointment> appointments = appointmentService.getAppointmentByStatus(status);
+        List<AppointmentResponse> appointmentResponses = appointments.stream()
+                .map(ModelMappings::toAppointmentResponse).toList();
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Appointments fetched by status",appointmentResponses));
     }
 }

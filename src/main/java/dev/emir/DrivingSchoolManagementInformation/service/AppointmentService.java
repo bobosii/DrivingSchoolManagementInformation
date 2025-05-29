@@ -95,6 +95,8 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
+    // --------------------- LIST APPOINTMENTS ------------------
+
     public List<Appointment> getAll(){
         return appointmentRepository.findAll();
     }
@@ -109,4 +111,13 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("No appointments found for instructor with ID: " + instructorId));
     }
 
+    public List<Appointment> getAppointmentsBetweenDates(LocalDateTime start, LocalDateTime end){
+        return appointmentRepository.findByAppointmentTimeBetween(start,end)
+                .orElseThrow(() -> new IllegalArgumentException("No appointments found between these dates"));
+    }
+
+    public List<Appointment> getAppointmentByStatus(AppointmentStatus status){
+        return appointmentRepository.findByStatus(status)
+                .orElseThrow(() -> new IllegalArgumentException("No appointments found have this status"));
+    }
 }
