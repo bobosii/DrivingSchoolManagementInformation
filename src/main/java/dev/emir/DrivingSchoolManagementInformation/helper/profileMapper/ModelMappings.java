@@ -59,21 +59,27 @@ public class ModelMappings {
         return response;
     }
 
-    public static ApiResponse<AppointmentResponse> toAppointmentResponse(Appointment appointment){
-        String studentName = appointment.getStudent().getUser().getUsername(); // veya getFullName()
-        String instructorName = appointment.getInstructor().getUser().getUsername(); // veya getFullName()
+    public static AppointmentResponse toAppointmentResponse(Appointment appointment){
+        Student student = appointment.getStudent();
+        Instructor instructor = appointment.getInstructor();
+        AppointmentType type = appointment.getAppointmentType();
+        CourseSession courseSession = appointment.getCourseSession();
 
-        AppointmentResponse responseData = new AppointmentResponse(
-                studentName,
-                instructorName,
-                appointment.getCourseSession().getId(),
-                appointment.getAppointmentType().getId(),
-                appointment.getStatus(),
-                appointment.getRequestedAt(),
-                appointment.getApprovedAt(),
-                appointment.getAppointmentTime()
-        );
-        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true,"Appointment created successfully",responseData);
-        return response;
+
+        AppointmentResponse responseData = new AppointmentResponse();
+        responseData.setStudentId(student.getId());
+        responseData.setStudentName(student.getFullName());
+        responseData.setInstructorId(instructor.getId());
+        responseData.setInstructorName(instructor.getFullName());
+        responseData.setCourseSessionId(courseSession.getId());
+        responseData.setCourseName(courseSession.getCourse().getName());
+        responseData.setAppointmentTypeId(type.getId());
+        responseData.setAppointmentTypeName(type.getName());
+        responseData.setStatus(appointment.getStatus());
+        responseData.setRequestedAt(appointment.getRequestedAt());
+        responseData.setApprovedAt(appointment.getApprovedAt());
+        responseData.setAppointmentTime(appointment.getAppointmentTime());
+
+        return responseData;
     }
 }

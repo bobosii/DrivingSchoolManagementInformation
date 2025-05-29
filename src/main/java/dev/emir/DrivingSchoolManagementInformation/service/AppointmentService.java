@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AppointmentService {
@@ -93,4 +94,19 @@ public class AppointmentService {
 
         return appointmentRepository.save(appointment);
     }
+
+    public List<Appointment> getAll(){
+        return appointmentRepository.findAll();
+    }
+
+    public List<Appointment> getByStudentId(Long studentId){
+        return appointmentRepository.findByStudentId(studentId)
+                .orElseThrow(() -> new RuntimeException("No appointments found for student with ID: " + studentId));
+    }
+
+    public List<Appointment> getByInstructorId(Long instructorId){
+        return appointmentRepository.findByInstructorId(instructorId)
+                .orElseThrow(() -> new RuntimeException("No appointments found for instructor with ID: " + instructorId));
+    }
+
 }
