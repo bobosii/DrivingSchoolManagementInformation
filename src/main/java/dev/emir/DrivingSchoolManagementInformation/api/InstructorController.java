@@ -4,7 +4,7 @@ import dev.emir.DrivingSchoolManagementInformation.dao.InstructorRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.InstructorProfileResponse;
-import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ProfileResponseMapper;
+import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
 import dev.emir.DrivingSchoolManagementInformation.models.Instructor;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class InstructorController {
         Instructor instructor = instructorRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Instructor not found"));
 
-        InstructorProfileResponse profile = ProfileResponseMapper.toInstructorProfile(instructor,user);
+        InstructorProfileResponse profile = ModelMappings.toInstructorProfile(instructor,user);
         ApiResponse<InstructorProfileResponse> response = new ApiResponse<>(true,"Instructor profile fetched",profile);
         return ResponseEntity.ok(response);
     }

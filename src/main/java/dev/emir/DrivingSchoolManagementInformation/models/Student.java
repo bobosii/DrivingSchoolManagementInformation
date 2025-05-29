@@ -67,6 +67,10 @@ public class Student {
         this.simulatorSessions = simulatorSessions;
     }
 
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
+
     public Long getId() {
         return id;
     }

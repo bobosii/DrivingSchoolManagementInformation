@@ -1,13 +1,14 @@
 package dev.emir.DrivingSchoolManagementInformation.helper.profileMapper;
 
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.AppointmentResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.employee.EmployeeProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.InstructorProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.models.*;
 
-public class ProfileResponseMapper {
+public class ModelMappings {
 
     public static StudentProfileResponse toStudentProfile(Student student, User user){
         return new StudentProfileResponse(
@@ -55,6 +56,24 @@ public class ProfileResponseMapper {
                 created.getEndTime()
         );
         ApiResponse<CourseSessionResponse> response = new ApiResponse<>(true,"Course sesion created successfully",responseData);
+        return response;
+    }
+
+    public static ApiResponse<AppointmentResponse> toAppointmentResponse(Appointment appointment){
+        String studentName = appointment.getStudent().getUser().getUsername(); // veya getFullName()
+        String instructorName = appointment.getInstructor().getUser().getUsername(); // veya getFullName()
+
+        AppointmentResponse responseData = new AppointmentResponse(
+                studentName,
+                instructorName,
+                appointment.getCourseSession().getId(),
+                appointment.getAppointmentType().getId(),
+                appointment.getStatus(),
+                appointment.getRequestedAt(),
+                appointment.getApprovedAt(),
+                appointment.getAppointmentTime()
+        );
+        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true,"Appointment created successfully",responseData);
         return response;
     }
 }

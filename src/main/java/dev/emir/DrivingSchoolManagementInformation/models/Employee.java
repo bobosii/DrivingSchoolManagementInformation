@@ -35,6 +35,11 @@ public class Employee {
         this.user = user;
     }
 
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
+
+
     // Getter-setter'lar
     public Long getId() {
         return id;

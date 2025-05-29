@@ -3,7 +3,7 @@ package dev.emir.DrivingSchoolManagementInformation.api;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.course.CreateCourseSessionRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionResponse;
-import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ProfileResponseMapper;
+import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
 import dev.emir.DrivingSchoolManagementInformation.models.CourseSession;
 import dev.emir.DrivingSchoolManagementInformation.service.CourseSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class CourseSessionController {
                 request.getEndTime()
         );
 
-        ApiResponse<CourseSessionResponse> response = ProfileResponseMapper.getCourseSessionResponse(created);
+        ApiResponse<CourseSessionResponse> response = ModelMappings.getCourseSessionResponse(created);
 
         return ResponseEntity.ok(response);
 

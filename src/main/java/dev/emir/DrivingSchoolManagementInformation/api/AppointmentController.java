@@ -1,0 +1,81 @@
+package dev.emir.DrivingSchoolManagementInformation.api;
+
+import dev.emir.DrivingSchoolManagementInformation.dto.request.ApproveAppointmentRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.request.appointment.AppointmentCancelRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.request.appointment.AppointmentRejectRequets;
+import dev.emir.DrivingSchoolManagementInformation.dto.request.appointment.AppointmentRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.AppointmentResponse;
+import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
+import dev.emir.DrivingSchoolManagementInformation.models.Appointment;
+import dev.emir.DrivingSchoolManagementInformation.service.AppointmentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/appointments")
+public class AppointmentController {
+    private final AppointmentService appointmentService;
+
+    @Autowired
+    public AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(@RequestBody AppointmentRequest request){
+        Appointment created = appointmentService.createAppointment(request);
+
+        AppointmentResponse response = new AppointmentResponse(
+                created.getStudent().getFullName(),
+                created.getInstructor().getFullName(),
+                created.getCourseSession().getId(),
+                created.getAppointmentType().getId(),
+                created.getStatus(),
+                created.getRequestedAt(),
+                created.getApprovedAt(),
+                created.getAppointmentTime()
+        );
+
+        ApiResponse<AppointmentResponse> apiResponse = new ApiResponse<>(
+                true,
+                "Appointment created successfully",
+                response
+        );
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    @PutMapping("/approve")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> approveAppointment(
+            @RequestBody ApproveAppointmentRequest request
+    ){
+        Appointment appointment = appointmentService.approveAppointment(request.getAppointmentId(),request.getApproverId());
+        ApiResponse<AppointmentResponse> response = ModelMappings.toAppointmentResponse(appointment);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/reject")
+    @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> rejectAppointment(
+            @RequestBody AppointmentRejectRequets requets
+            ){
+        Appointment appointment = appointmentService.rejectAppointment(requets.getAppointmentId(), requets.getApproverId());
+        ApiResponse<AppointmentResponse> response = ModelMappings.toAppointmentResponse(appointment);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/cancel")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> cancelAppointment(
+            @RequestBody AppointmentCancelRequest request
+            ){
+        Appointment appointment = appointmentService.cancelAppointment(request.getAppointmentId(),request.getStudentId());
+        ApiResponse<AppointmentResponse> response = ModelMappings.toAppointmentResponse(appointment);
+        return ResponseEntity.ok(response);
+    }
+
+}

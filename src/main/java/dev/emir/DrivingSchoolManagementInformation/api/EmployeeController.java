@@ -5,7 +5,7 @@ import dev.emir.DrivingSchoolManagementInformation.dao.EmployeeRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.employee.EmployeeProfileResponse;
-import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ProfileResponseMapper;
+import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
 import dev.emir.DrivingSchoolManagementInformation.models.Employee;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class EmployeeController {
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
 
-        EmployeeProfileResponse profile = ProfileResponseMapper.toEmployeeProfile(employee,user);
+        EmployeeProfileResponse profile = ModelMappings.toEmployeeProfile(employee,user);
 
         ApiResponse<EmployeeProfileResponse> response = new ApiResponse<>(true,"Employee profile fetched successfully",profile);
         return ResponseEntity.ok(response);

@@ -9,7 +9,7 @@ import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.studentCourseSession.StudentCourseSessionResponse;
-import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ProfileResponseMapper;
+import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
 import dev.emir.DrivingSchoolManagementInformation.models.Student;
 import dev.emir.DrivingSchoolManagementInformation.models.StudentCourseSession;
 import dev.emir.DrivingSchoolManagementInformation.models.Term;
@@ -97,7 +97,7 @@ public class StudentController {
         Student student = studentRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
-        StudentProfileResponse profile = ProfileResponseMapper.toStudentProfile(student,user);
+        StudentProfileResponse profile = ModelMappings.toStudentProfile(student,user);
         ApiResponse<StudentProfileResponse> response = new ApiResponse<>(true,"Profil bilgileri basariyla getirildi",profile);
 
         return ResponseEntity.ok(response);
