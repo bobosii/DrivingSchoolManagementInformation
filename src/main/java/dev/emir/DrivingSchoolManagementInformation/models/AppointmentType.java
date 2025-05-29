@@ -12,7 +12,7 @@ public class AppointmentType {
     private Long id;
     private String name; //Simulator, Practical
 
-    @OneToMany(mappedBy = "type")
+    @OneToMany(mappedBy = "appointmentType")
     private List<Appointment> appointments;
 
     public AppointmentType(){}

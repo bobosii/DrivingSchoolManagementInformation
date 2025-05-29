@@ -25,8 +25,8 @@ public class Appointment {
     @JoinColumn(name = "course_session_id")
     private CourseSession courseSession;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "appointment_type_id", nullable = false)
+    @ManyToOne()
+    @JoinColumn(name = "appointment_type_id")
     private AppointmentType appointmentType;
 
     @Enumerated(EnumType.STRING)
