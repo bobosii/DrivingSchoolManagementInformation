@@ -17,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,7 +75,7 @@ public class AppointmentController {
     // --------------------- UPDATE APPOINTMENT STATUS ------------------
     // --------------------- LIST APPOINTMENTS ------------------
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<List<AppointmentResponse>>> getAllAppointments(){
         List<Appointment> appointments = appointmentService.getAll();
@@ -121,6 +120,7 @@ public class AppointmentController {
         List<AppointmentResponse> appointmentResponses = appointments.stream()
                 .map(ModelMappings::toAppointmentResponse)
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(new ApiResponse<>(true,"Appointments between dates fetched",appointmentResponses));
     }
 
@@ -135,4 +135,5 @@ public class AppointmentController {
 
         return ResponseEntity.ok(new ApiResponse<>(true, "Appointments fetched by status",appointmentResponses));
     }
+    // --------------------- LIST APPOINTMENTS ------------------
 }

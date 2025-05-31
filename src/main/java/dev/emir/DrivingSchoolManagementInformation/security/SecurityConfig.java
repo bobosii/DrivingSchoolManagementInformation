@@ -30,12 +30,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors() // BUNU EKLEDİN!
+                .and()
                 .csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**","/api/student/register").permitAll()
+                .requestMatchers("/api/auth/**", "/api/student/register").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/theoretical/**").hasAnyRole("ADMIN","EMPLOYEE")
-                .requestMatchers("/api/term/**").hasAnyRole("ADMIN","EMPLOYEE")
+                .requestMatchers("/api/theoretical/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                .requestMatchers("/api/term/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                .requestMatchers("/api/appointments/**").hasAnyRole("ADMIN", "EMPLOYEE")
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -44,7 +47,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
