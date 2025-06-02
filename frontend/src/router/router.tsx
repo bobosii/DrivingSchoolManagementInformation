@@ -1,67 +1,144 @@
-import { createBrowserRouter } from 'react-router-dom';
-import AppLayout from '../layouts/Applayout';
-import Home from '../pages/Home';
-import Login from '../pages/Login';
-import Unauthorized from '../pages/UnAuthorized';
-import ProtectedRoute from '../components/ProtectedRoute';
-import AdminDashboard from '../pages/AdminDashboard';
-import InstructorDashboard from '../pages/InstructorDashboard';
-import StudentDashboard from '../pages/StudentDashboard';
-import EmployeeDashboard from '../pages/EmployeeDashboard';
-import AppointmentsPage from '../pages/appointmentPage/AppointmentsPage';
+import { createBrowserRouter } from "react-router-dom";
+import AppLayout from "../layouts/Applayout";
+import Home from "../pages/Home";
+import { Login } from "../pages/Login";
+import Unauthorized from "../pages/UnAuthorized";
+import ProtectedRoute from "../components/ProtectedRoute";
+import AdminDashboard from "../pages/AdminDashboard";
+import InstructorDashboard from "../pages/InstructorDashboard";
+import StudentDashboard from "../pages/StudentDashboard";
+import EmployeeDashboard from "../pages/EmployeeDashboard";
+import AppointmentsPage from "../pages/appointmentPage/AppointmentsPage";
+import EmployeeProfile from "../pages/profile/EmployeeProfile";
 
 export const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <AppLayout />,
-        children: [
-            { path: '', element: <Home /> },
-            { path: 'login', element: <Login /> },
-            {
-                path: '/unauthorized',
-                element: <Unauthorized />
-            },
-            {
-                path: '/admin',
-                element: (
-                    <ProtectedRoute allowedRoles={["ADMIN"]}>
-                        <AdminDashboard />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path: '/employee',
-                element: (
-                    <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
-                        <EmployeeDashboard />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path: '/instructor',
-                element: (
-                    <ProtectedRoute allowedRoles={["INSTRUCTOR"]}>
-                        <InstructorDashboard />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path: '/student',
-                element: (
-                    <ProtectedRoute allowedRoles={["STUDENT"]}>
-                        <StudentDashboard />
-                    </ProtectedRoute>
-                )
-            },
-            {
-                path: '/appointments',
-                element: (
-                    <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE"]}>
-                        <AppointmentsPage />
-                    </ProtectedRoute>
-                )
-            }
-        ],
-    },
+  {
+    path: "/",
+    element: <AppLayout />,
+    children: [
+      { path: "", element: <Home /> },
+      { path: "login", element: <Login /> },
+      {
+        path: "/unauthorized",
+        element: <Unauthorized />,
+      },
+      {
+        path: "/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "INSTRUCTOR", "STUDENT"]}>
+            {({ role }) => {
+              switch (role) {
+                case "ADMIN":
+                  return <AdminDashboard />;
+                case "EMPLOYEE":
+                  return <EmployeeDashboard />;
+                case "INSTRUCTOR":
+                  return <InstructorDashboard />;
+                case "STUDENT":
+                  return <StudentDashboard />;
+                default:
+                  return <Unauthorized />;
+              }
+            }}
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <AdminDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/employee",
+        element: (
+          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
+            <EmployeeDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/employee/profile",
+        element: (
+          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
+            <EmployeeProfile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/instructor",
+        element: (
+          <ProtectedRoute allowedRoles={["INSTRUCTOR"]}>
+            <InstructorDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/student",
+        element: (
+          <ProtectedRoute allowedRoles={["STUDENT"]}>
+            <StudentDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/appointments",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "INSTRUCTOR", "STUDENT"]}>
+            <AppointmentsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/users",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <div>Users Page</div>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/vehicles",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "INSTRUCTOR"]}>
+            <div>Vehicles Page</div>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/documents",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "STUDENT", "EMPLOYEE"]}>
+            <div>Documents Page</div>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/lessons",
+        element: (
+          <ProtectedRoute allowedRoles={["STUDENT", "INSTRUCTOR"]}>
+            <div>Lessons Page</div>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/exams",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "STUDENT", "EMPLOYEE"]}>
+            <div>Exams Page</div>
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "INSTRUCTOR", "STUDENT"]}>
+            <div>Profile Page</div>
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
 ]);
-

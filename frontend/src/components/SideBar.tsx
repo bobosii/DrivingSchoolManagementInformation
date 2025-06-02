@@ -1,10 +1,75 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {
+    Home,
+    Calendar,
+    Users,
+    Car,
+    FileText,
+    BookOpen,
+    Settings,
+    LogOut,
+    User,
+    ClipboardList,
+} from 'lucide-react';
+
+interface MenuItem {
+    icon: React.ComponentType<any>;
+    label: string;
+    path: string;
+    roles: Array<'ADMIN' | 'STUDENT' | 'INSTRUCTOR' | 'EMPLOYEE'>;
+}
+
+const menuItems: MenuItem[] = [
+    {
+        icon: Home,
+        label: 'Dashboard',
+        path: '/dashboard',
+        roles: ['ADMIN', 'STUDENT', 'INSTRUCTOR', 'EMPLOYEE'],
+    },
+    {
+        icon: Calendar,
+        label: 'Randevular',
+        path: '/appointments',
+        roles: ['ADMIN', 'STUDENT', 'INSTRUCTOR', 'EMPLOYEE'],
+    },
+    {
+        icon: Users,
+        label: 'Kullanıcılar',
+        path: '/users',
+        roles: ['ADMIN'],
+    },
+    {
+        icon: Car,
+        label: 'Araçlar',
+        path: '/vehicles',
+        roles: ['ADMIN', 'INSTRUCTOR'],
+    },
+    {
+        icon: FileText,
+        label: 'Belgeler',
+        path: '/documents',
+        roles: ['ADMIN', 'STUDENT', 'EMPLOYEE'],
+    },
+    {
+        icon: BookOpen,
+        label: 'Dersler',
+        path: '/lessons',
+        roles: ['STUDENT', 'INSTRUCTOR'],
+    },
+    {
+        icon: ClipboardList,
+        label: 'Sınavlar',
+        path: '/exams',
+        roles: ['ADMIN', 'STUDENT', 'EMPLOYEE'],
+    },
+];
 
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [userRole, setUserRole] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string>('');
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -12,6 +77,7 @@ const Sidebar = () => {
             try {
                 const decoded = JSON.parse(atob(token.split(".")[1]));
                 setUserRole(decoded.role);
+                setUserName(decoded.name || '');
             } catch {
                 localStorage.removeItem("token");
             }
@@ -23,44 +89,79 @@ const Sidebar = () => {
         navigate("/login");
     };
 
-    const getLinkClass = (path: string) =>
-        `block px-4 py-3 rounded hover:bg-blue-100 ${location.pathname === path ? "bg-blue-200 font-semibold" : ""
-        }`;
+    const filteredMenuItems = menuItems.filter((item) =>
+        userRole ? item.roles.includes(userRole as any) : false
+    );
 
     return (
-        <div className="fixed top-0 left-0 h-screen w-64 bg-white border-r shadow-lg flex flex-col justify-between z-50">
-            {/* Üst Logo ve Menü */}
-            <div>
-                <div className="text-2xl font-bold text-blue-600 p-6 border-b">Driving School</div>
-                <nav className="flex flex-col gap-1 px-4 py-6">
-                    {userRole === "ADMIN" && (
-                        <>
-                            <Link to="/admin" className={getLinkClass("/admin")}>Dashboard</Link>
-                            <Link to="/appointments" className={getLinkClass("/appointments")}>Appointments</Link>
-                        </>
-                    )}
-                    {userRole === "EMPLOYEE" && (
-                        <>
-                            <Link to="/employee" className={getLinkClass("/employee")}>Dashboard</Link>
-                            <Link to="/appointments" className={getLinkClass("/appointments")}>Appointments</Link>
-                        </>
-                    )}
-                    {userRole === "INSTRUCTOR" && (
-                        <Link to="/instructor" className={getLinkClass("/instructor")}>Dashboard</Link>
-                    )}
-                    {userRole === "STUDENT" && (
-                        <Link to="/student" className={getLinkClass("/student")}>Dashboard</Link>
-                    )}
-                </nav>
+        <div className="h-full bg-gradient-to-b from-slate-900 to-slate-800 text-white w-64 flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-700">
+                <h1 className="text-xl font-bold text-center">
+                    Sürücü Kursu
+                </h1>
+                <p className="text-slate-300 text-sm text-center mt-1">
+                    Bilgi Yönetim Sistemi
+                </p>
             </div>
 
-            {/* Alt Logout Butonu */}
-            <div className="p-4 border-t">
+            {/* User Info */}
+            <div className="p-4 border-b border-slate-700">
+                <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center">
+                        <User size={20} />
+                    </div>
+                    <div>
+                        <p className="font-medium text-sm">
+                            {userName}
+                        </p>
+                        <p className="text-slate-400 text-xs">
+                            {userRole}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 p-4 space-y-1">
+                {filteredMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-200 ${
+                                location.pathname === item.path
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                            }`}
+                        >
+                            <Icon size={18} />
+                            <span className="text-sm font-medium">{item.label}</span>
+                        </Link>
+                    );
+                })}
+            </nav>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-700 space-y-1">
+                <Link
+                    to="/profile"
+                    className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-200 ${
+                        location.pathname === '/profile'
+                            ? 'bg-blue-600 text-white'
+                            : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    }`}
+                >
+                    <Settings size={18} />
+                    <span className="text-sm font-medium">Profil</span>
+                </Link>
                 <button
                     onClick={handleLogout}
-                    className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+                    className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-red-600 hover:text-white transition-colors duration-200"
                 >
-                    Logout
+                    <LogOut size={18} />
+                    <span className="text-sm font-medium">Çıkış Yap</span>
                 </button>
             </div>
         </div>
