@@ -48,11 +48,13 @@ public class TestInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         User studentUser = createUserIfNotExists("student", "student123", Role.STUDENT);
+        User studentUser2 = createUserIfNotExists("student2", "student123", Role.STUDENT);
         User instructorUser = createUserIfNotExists("instructor", "instructor123", Role.INSTRUCTOR);
         User employeeUser = createUserIfNotExists("employee", "employee123", Role.EMPLOYEE);
         User adminUser = createUserIfNotExists("admin", "admin123", Role.ADMIN);
 
         Student student = createStudentIfNotExists(studentUser);
+        Student student2 = createStudentIfNotExists(studentUser2);
         Instructor instructor = createInstructorIfNotExists(instructorUser);
         Employee employee = createEmployeeIfNotExists(employeeUser);
 

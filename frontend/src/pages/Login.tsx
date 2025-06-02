@@ -21,8 +21,9 @@ export const Login: React.FC = () => {
                 password
             });
 
-            const { token } = response.data;
+            const { token, linkedEntityId } = response.data;
             localStorage.setItem("token", token);
+            localStorage.setItem("linkedEntityId", linkedEntityId);
 
             const decodedToken = JSON.parse(atob(token.split(".")[1]));
             const role = decodedToken.role;
