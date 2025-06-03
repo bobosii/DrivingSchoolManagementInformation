@@ -1,7 +1,9 @@
 import React from 'react';
 import { Bell, Search, User } from 'lucide-react';
+import { useSearch } from '../context/SearchContext';
 
 export const Navbar: React.FC = () => {
+    const { searchTerm, setSearchTerm } = useSearch();
     return (
         <div className="bg-white border-b border-gray-200">
             <div className="px-8 py-4">
@@ -13,6 +15,8 @@ export const Navbar: React.FC = () => {
                             <input
                                 type="text"
                                 placeholder="Ara..."
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
                                 className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
                             />
                         </div>

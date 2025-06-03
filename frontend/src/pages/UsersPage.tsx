@@ -3,6 +3,7 @@ import { getAllUsers } from "../services/userService";
 import type { User } from "../types/user";
 import axios from "axios";
 import type { StudentDetail } from "../types/StudentDetail";
+import { useSearch } from "../context/SearchContext";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -14,6 +15,17 @@ export default function UsersPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [studentDetail, setStudentDetail] = useState<StudentDetail | null>(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [addForm, setAddForm] = useState({ username: "", password: "", fullName: "", role: "STUDENT", firstName: "", lastName: "", email: "", birthDate: "" });
+    const [addLoading, setAddLoading] = useState(false);
+    const [addError, setAddError] = useState<string | null>(null);
+    const [addSuccess, setAddSuccess] = useState<string | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editForm, setEditForm] = useState<any>(null);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editError, setEditError] = useState<string | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
+    const { searchTerm } = useSearch();
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -33,12 +45,21 @@ export default function UsersPage() {
     }, []);
 
     useEffect(() => {
-        if (selectedRole === "ALL") {
-            setFilteredUsers(users);
-        } else {
-            setFilteredUsers(users.filter(user => user.role === selectedRole));
+        let filtered = users;
+        if (selectedRole !== "ALL") {
+            filtered = filtered.filter(user => user.role === selectedRole);
         }
-    }, [selectedRole, users]);
+        if (searchTerm.trim() !== "") {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(user =>
+                user.username.toLowerCase().includes(term) ||
+                (user.fullName && user.fullName.toLowerCase().includes(term)) ||
+                (user.firstName && user.firstName.toLowerCase().includes(term)) ||
+                (user.lastName && user.lastName.toLowerCase().includes(term))
+            );
+        }
+        setFilteredUsers(filtered);
+    }, [selectedRole, users, searchTerm]);
 
     const handleViewDetails = async (user: User) => {
         setSelectedUser(user);
@@ -87,6 +108,101 @@ export default function UsersPage() {
         setStudentDetail(null);
     };
 
+    const handleAddInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setAddForm({ ...addForm, [e.target.name]: e.target.value });
+    };
+
+    const handleAddUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setAddLoading(true);
+        setAddError(null);
+        setAddSuccess(null);
+        try {
+            const token = localStorage.getItem("token");
+            // fullName is not used in backend anymore, but kept for compatibility
+            const payload = { ...addForm };
+            const response = await axios.post(
+                "http://localhost:8080/api/admin/users",
+                payload,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setAddSuccess("User created successfully.");
+            setIsAddModalOpen(false);
+            setAddForm({ username: "", password: "", fullName: "", role: "STUDENT", firstName: "", lastName: "", email: "", birthDate: "" });
+            // Refresh user list
+            const data = await getAllUsers();
+            setUsers(data);
+            setFilteredUsers(selectedRole === "ALL" ? data : data.filter(user => user.role === selectedRole));
+        } catch (err: any) {
+            setAddError(err.response?.data?.message || "Failed to create user.");
+        } finally {
+            setAddLoading(false);
+        }
+    };
+
+    const openEditModal = (user: User) => {
+        setEditForm({
+            id: user.id,
+            username: user.username,
+            password: "",
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            email: user.email || "",
+            birthDate: user.birthDate || "",
+            role: user.role
+        });
+        setIsEditModalOpen(true);
+        setEditError(null);
+    };
+
+    const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    };
+
+    const handleEditUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setEditLoading(true);
+        setEditError(null);
+        try {
+            const token = localStorage.getItem("token");
+            const payload = { ...editForm };
+            delete payload.id;
+            const response = await axios.put(
+                `http://localhost:8080/api/admin/users/${editForm.id}`,
+                payload,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setIsEditModalOpen(false);
+            // Refresh user list
+            const data = await getAllUsers();
+            setUsers(data);
+            setFilteredUsers(selectedRole === "ALL" ? data : data.filter(user => user.role === selectedRole));
+        } catch (err: any) {
+            setEditError(err.response?.data?.message || "Failed to update user.");
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+    const handleDeleteUser = async (userId: number) => {
+        if (!window.confirm("Bu kullanıcıyı silmek istediğinize emin misiniz?")) return;
+        setDeleteLoading(userId);
+        try {
+            const token = localStorage.getItem("token");
+            await axios.delete(`http://localhost:8080/api/admin/users/${userId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            // Refresh user list
+            const data = await getAllUsers();
+            setUsers(data);
+            setFilteredUsers(selectedRole === "ALL" ? data : data.filter(user => user.role === selectedRole));
+        } catch (err) {
+            alert("Kullanıcı silinirken bir hata oluştu.");
+        } finally {
+            setDeleteLoading(null);
+        }
+    };
+
     if (loading) {
         return (
             <div className="p-6">
@@ -109,9 +225,15 @@ export default function UsersPage() {
 
     return (
         <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold">Users</h1>
-                <div className="flex items-center space-x-2">
+                <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="bg-red-600 text-white px-4 py-2 rounded-md font-medium hover:bg-red-700 transition-colors"
+                    >
+                        Kullanıcı Ekle
+                    </button>
                     <label htmlFor="roleFilter" className="text-sm font-medium text-gray-700">
                         Filter by Role:
                     </label>
@@ -174,9 +296,22 @@ export default function UsersPage() {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <button
                                         onClick={() => handleViewDetails(user)}
-                                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200"
+                                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 mr-2"
                                     >
-                                        View Details
+                                        Detayları Göster
+                                    </button>
+                                    <button
+                                        onClick={() => openEditModal(user)}
+                                        className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 mr-2"
+                                    >
+                                        Düzenle
+                                    </button>
+                                    <button
+                                        onClick={() => handleDeleteUser(user.id)}
+                                        disabled={deleteLoading === user.id}
+                                        className="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 disabled:opacity-50"
+                                    >
+                                        {deleteLoading === user.id ? "Siliniyor..." : "Sil"}
                                     </button>
                                 </td>
                             </tr>
@@ -316,6 +451,223 @@ export default function UsersPage() {
                                 Close
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add User Modal */}
+            {isAddModalOpen && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6 relative">
+                        <button
+                            onClick={() => setIsAddModalOpen(false)}
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <h2 className="text-xl font-bold mb-4">Kullanıcı Ekle</h2>
+                        <form onSubmit={handleAddUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Kullanıcı Adı</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={addForm.username}
+                                    onChange={handleAddInputChange}
+                                    required
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Şifre</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={addForm.password}
+                                    onChange={handleAddInputChange}
+                                    required
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Ad</label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={addForm.firstName}
+                                        onChange={handleAddInputChange}
+                                        required={addForm.role !== "ADMIN"}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Soyad</label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={addForm.lastName}
+                                        onChange={handleAddInputChange}
+                                        required={addForm.role !== "ADMIN"}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">E-posta</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={addForm.email}
+                                    onChange={handleAddInputChange}
+                                    required={addForm.role !== "ADMIN"}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Doğum Tarihi</label>
+                                <input
+                                    type="date"
+                                    name="birthDate"
+                                    value={addForm.birthDate}
+                                    onChange={handleAddInputChange}
+                                    required={addForm.role !== "ADMIN"}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Rol</label>
+                                <select
+                                    name="role"
+                                    value={addForm.role}
+                                    onChange={handleAddInputChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                >
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="EMPLOYEE">Employee</option>
+                                    <option value="INSTRUCTOR">Instructor</option>
+                                    <option value="STUDENT">Student</option>
+                                </select>
+                            </div>
+                            {addError && <div className="text-red-600 text-sm">{addError}</div>}
+                            <button
+                                type="submit"
+                                disabled={addLoading}
+                                className="w-full bg-red-600 text-white py-2 rounded-md font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                            >
+                                {addLoading ? "Ekleniyor..." : "Ekle"}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit User Modal */}
+            {isEditModalOpen && editForm && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6 relative">
+                        <button
+                            onClick={() => setIsEditModalOpen(false)}
+                            className="absolute top-2 right-2 text-gray-400 hover:text-gray-700"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <h2 className="text-xl font-bold mb-4">Kullanıcıyı Düzenle</h2>
+                        <form onSubmit={handleEditUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Kullanıcı Adı</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={editForm.username}
+                                    onChange={handleEditInputChange}
+                                    required
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Şifre (değiştirmek için doldurun)</label>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={editForm.password}
+                                    onChange={handleEditInputChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Ad</label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={editForm.firstName}
+                                        onChange={handleEditInputChange}
+                                        required={editForm.role !== "ADMIN"}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Soyad</label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={editForm.lastName}
+                                        onChange={handleEditInputChange}
+                                        required={editForm.role !== "ADMIN"}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">E-posta</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={editForm.email}
+                                    onChange={handleEditInputChange}
+                                    required={editForm.role !== "ADMIN"}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Doğum Tarihi</label>
+                                <input
+                                    type="date"
+                                    name="birthDate"
+                                    value={editForm.birthDate}
+                                    onChange={handleEditInputChange}
+                                    required={editForm.role !== "ADMIN"}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Rol</label>
+                                <select
+                                    name="role"
+                                    value={editForm.role}
+                                    onChange={handleEditInputChange}
+                                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                >
+                                    <option value="ADMIN">Admin</option>
+                                    <option value="EMPLOYEE">Employee</option>
+                                    <option value="INSTRUCTOR">Instructor</option>
+                                    <option value="STUDENT">Student</option>
+                                </select>
+                            </div>
+                            {editError && <div className="text-red-600 text-sm">{editError}</div>}
+                            <button
+                                type="submit"
+                                disabled={editLoading}
+                                className="w-full bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+                            >
+                                {editLoading ? "Güncelleniyor..." : "Kaydet"}
+                            </button>
+                        </form>
                     </div>
                 </div>
             )}
