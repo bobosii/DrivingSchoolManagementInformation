@@ -9,6 +9,7 @@ import dev.emir.DrivingSchoolManagementInformation.dto.request.course.CreateCour
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.employee.EmployeeRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.InstructorRegisterResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.UserResponse;
 import dev.emir.DrivingSchoolManagementInformation.models.Course;
 import dev.emir.DrivingSchoolManagementInformation.models.Employee;
 import dev.emir.DrivingSchoolManagementInformation.models.Instructor;
@@ -21,6 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -119,6 +123,31 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<UserResponse> userResponses = users.stream()
+                .map(user -> {
+                    String fullName = "";
+                    if (user.getStudent() != null) {
+                        fullName = user.getStudent().getFirstName() + " " + user.getStudent().getLastName();
+                    } else if (user.getInstructor() != null) {
+                        fullName = user.getInstructor().getFirstName() + " " + user.getInstructor().getLastName();
+                    } else if (user.getEmployee() != null) {
+                        fullName = user.getEmployee().getFirstName() + " " + user.getEmployee().getLastName();
+                    }
 
+                    return new UserResponse(
+                            user.getId(),
+                            user.getUsername(),
+                            fullName,
+                            user.getRole().name()
+                    );
+                })
+                .collect(Collectors.toList());
 
+        return ResponseEntity.ok(new ApiResponse<>(true, "Users retrieved successfully", userResponses));
+    }
 }
+

@@ -10,6 +10,7 @@ import StudentDashboard from "../pages/StudentDashboard";
 import EmployeeDashboard from "../pages/EmployeeDashboard";
 import AppointmentsPage from "../pages/appointmentPage/AppointmentsPage";
 import EmployeeProfile from "../pages/profile/EmployeeProfile";
+import UsersPage from "../pages/UsersPage";
 
 export const router = createBrowserRouter([
   {
@@ -95,7 +96,7 @@ export const router = createBrowserRouter([
         path: "/users",
         element: (
           <ProtectedRoute allowedRoles={["ADMIN"]}>
-            <div>Users Page</div>
+            <UsersPage />
           </ProtectedRoute>
         ),
       },
