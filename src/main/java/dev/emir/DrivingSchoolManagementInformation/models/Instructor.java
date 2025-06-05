@@ -1,5 +1,7 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -19,14 +21,20 @@ public class Instructor {
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "instructor")
-    private List<CourseSession> sessions;
+    @JsonManagedReference
+    private List<CourseSession> courseSessions;
+
+    @OneToMany(mappedBy = "instructor")
+    @JsonManagedReference
+    private List<Appointment> appointments;
 
     public Instructor() {}
 
-    public Instructor(Long id, String firstName, String lastName, String email, LocalDate birthDate, String certificationNo, User user, List<CourseSession> sessions) {
+    public Instructor(Long id, String firstName, String lastName, String email, LocalDate birthDate, String certificationNo, User user, List<CourseSession> courseSessions, List<Appointment> appointments) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -34,7 +42,8 @@ public class Instructor {
         this.birthDate = birthDate;
         this.certificationNo = certificationNo;
         this.user = user;
-        this.sessions = sessions;
+        this.courseSessions = courseSessions;
+        this.appointments = appointments;
     }
 
     public String getFullName() {
@@ -97,11 +106,19 @@ public class Instructor {
         this.user = user;
     }
 
-    public List<CourseSession> getSessions() {
-        return sessions;
+    public List<CourseSession> getCourseSessions() {
+        return courseSessions;
     }
 
-    public void setSessions(List<CourseSession> sessions) {
-        this.sessions = sessions;
+    public void setCourseSessions(List<CourseSession> courseSessions) {
+        this.courseSessions = courseSessions;
+    }
+
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments) {
+        this.appointments = appointments;
     }
 }

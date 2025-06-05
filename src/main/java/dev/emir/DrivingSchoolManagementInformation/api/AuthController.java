@@ -35,9 +35,11 @@ public class AuthController {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow();
 
+        String usernameWithId = user.getUsername() + "_" + user.getId();
+
         String token = jwtUtil.generateToken(
                 new org.springframework.security.core.userdetails.User(
-                        user.getUsername(), user.getPassword(),
+                        usernameWithId, user.getPassword(),
                         Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))));
 
         Long linkedEntityId = null;

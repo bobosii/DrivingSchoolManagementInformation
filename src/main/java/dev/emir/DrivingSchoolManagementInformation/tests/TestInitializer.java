@@ -58,9 +58,13 @@ public class TestInitializer implements CommandLineRunner {
         Instructor instructor = createInstructorIfNotExists(instructorUser);
         Employee employee = createEmployeeIfNotExists(employeeUser);
 
-        Course course = createCourseIfNotExists();
+        Course course = createCoursePracticalIfNotExists();
+        Course course2 = createCourseTheoreticalIfNotExists();
+        Course courseSimulation = createCourseSimulationIfNotExists();
         Classroom classroom = createClassroomIfNotExists();
         CourseSession session = createCourseSessionIfNotExists(course, instructor, classroom);
+        CourseSession session1 = createCourseSessionIfNotExists(course2,instructor,classroom);
+        CourseSession session2 = createCourseSessionIfNotExists(courseSimulation,instructor,classroom);
 
         AppointmentType simType = createAppointmentTypeIfNotExists("SIMULATOR");
         AppointmentType drivingType = createAppointmentTypeIfNotExists("DRIVING");
@@ -124,11 +128,27 @@ public class TestInitializer implements CommandLineRunner {
                 });
     }
 
-    private Course createCourseIfNotExists() {
+    private Course createCoursePracticalIfNotExists() {
+        return courseRepository.findAll().stream().findFirst().orElseGet(() -> {
+            Course c = new Course();
+            c.setName("Traffic practice");
+            c.setCourseType(CourseType.DRIVING);
+            return courseRepository.save(c);
+        });
+    }
+    private Course createCourseTheoreticalIfNotExists() {
         return courseRepository.findAll().stream().findFirst().orElseGet(() -> {
             Course c = new Course();
             c.setName("Traffic Theory");
             c.setCourseType(CourseType.THEORETICAL);
+            return courseRepository.save(c);
+        });
+    }
+    private Course createCourseSimulationIfNotExists() {
+        return courseRepository.findAll().stream().findFirst().orElseGet(() -> {
+            Course c = new Course();
+            c.setName("Simulation");
+            c.setCourseType(CourseType.SIMULATION);
             return courseRepository.save(c);
         });
     }
@@ -170,8 +190,8 @@ public class TestInitializer implements CommandLineRunner {
             Appointment a = new Appointment();
             a.setStudent(student);
             a.setInstructor(instructor);
-            a.setCourseSession(session);
             a.setAppointmentType(type);
+            a.setCourseSession(session);
             a.setAppointmentTime(LocalDateTime.now().plusDays(2));
             a.setRequestedAt(LocalDateTime.now());
             a.setStatus(AppointmentStatus.PENDING);

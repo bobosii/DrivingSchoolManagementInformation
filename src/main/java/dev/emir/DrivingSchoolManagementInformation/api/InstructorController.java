@@ -16,22 +16,31 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("api/instructor")
+@RequestMapping("/api/instructors")
 public class InstructorController {
+    private final InstructorRepository instructorRepository;
     @Autowired
     private final UserRepository userRepository;
-    @Autowired
-    private final InstructorRepository instructorRepository;
 
-    public InstructorController(UserRepository userRepository, InstructorRepository instructorRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    public InstructorController(InstructorRepository instructorRepository, UserRepository userRepository) {
         this.instructorRepository = instructorRepository;
+        this.userRepository = userRepository;
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR', 'STUDENT')")
+    public ResponseEntity<ApiResponse<List<Instructor>>> getAllInstructors() {
+        List<Instructor> instructors = instructorRepository.findAll();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Instructors retrieved successfully", instructors));
     }
 
     @PreAuthorize("hasRole('INSTRUCTOR')")
     @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<InstructorProfileResponse>> getInstructorProfile(Authentication authentication){
+    public ResponseEntity<ApiResponse<InstructorProfileResponse>> getInstructorProfile(Authentication authentication) {
         String username = authentication.getName();
 
         User user = userRepository.findByUsername(username)
@@ -40,9 +49,8 @@ public class InstructorController {
         Instructor instructor = instructorRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Instructor not found"));
 
-        InstructorProfileResponse profile = ModelMappings.toInstructorProfile(instructor,user);
-        ApiResponse<InstructorProfileResponse> response = new ApiResponse<>(true,"Instructor profile fetched",profile);
+        InstructorProfileResponse profile = ModelMappings.toInstructorProfile(instructor, user);
+        ApiResponse<InstructorProfileResponse> response = new ApiResponse<>(true, "Instructor profile fetched", profile);
         return ResponseEntity.ok(response);
     }
-
 }

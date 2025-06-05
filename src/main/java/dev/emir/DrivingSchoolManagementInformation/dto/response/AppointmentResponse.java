@@ -5,14 +5,15 @@ import dev.emir.DrivingSchoolManagementInformation.models.enums.AppointmentStatu
 import java.time.LocalDateTime;
 
 public class AppointmentResponse {
+    private Long id;
     private Long studentId;
     private String studentName;
     private Long instructorId;
     private String instructorName;
-    private Long courseSessionId;
-    private String courseName;
     private Long appointmentTypeId;
     private String appointmentTypeName;
+    private Long courseSessionId;
+    private String courseName;
     private AppointmentStatus status;
     private LocalDateTime requestedAt;
     private LocalDateTime approvedAt;
@@ -20,19 +21,28 @@ public class AppointmentResponse {
 
     public AppointmentResponse(){}
 
-    public AppointmentResponse(Long studentId, String studentName, Long instructorId, String instructorName, Long courseSessionId, String courseName, Long appointmentTypeId, String appointmentTypeName, AppointmentStatus status, LocalDateTime requestedAt, LocalDateTime approvedAt, LocalDateTime appointmentTime) {
+    public AppointmentResponse(Long id, Long studentId, String studentName, Long instructorId, String instructorName, Long appointmentTypeId, String appointmentTypeName, Long courseSessionId, String courseName, AppointmentStatus status, LocalDateTime requestedAt, LocalDateTime approvedAt, LocalDateTime appointmentTime) {
+        this.id = id;
         this.studentId = studentId;
         this.studentName = studentName;
         this.instructorId = instructorId;
         this.instructorName = instructorName;
-        this.courseSessionId = courseSessionId;
-        this.courseName = courseName;
         this.appointmentTypeId = appointmentTypeId;
         this.appointmentTypeName = appointmentTypeName;
+        this.courseSessionId = courseSessionId;
+        this.courseName = courseName;
         this.status = status;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
         this.appointmentTime = appointmentTime;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getStudentId() {
@@ -67,22 +77,6 @@ public class AppointmentResponse {
         this.instructorName = instructorName;
     }
 
-    public Long getCourseSessionId() {
-        return courseSessionId;
-    }
-
-    public void setCourseSessionId(Long courseSessionId) {
-        this.courseSessionId = courseSessionId;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
     public Long getAppointmentTypeId() {
         return appointmentTypeId;
     }
@@ -97,6 +91,22 @@ public class AppointmentResponse {
 
     public void setAppointmentTypeName(String appointmentTypeName) {
         this.appointmentTypeName = appointmentTypeName;
+    }
+
+    public Long getCourseSessionId() {
+        return courseSessionId;
+    }
+
+    public void setCourseSessionId(Long courseSessionId) {
+        this.courseSessionId = courseSessionId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
     public AppointmentStatus getStatus() {

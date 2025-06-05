@@ -1,5 +1,6 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -12,17 +13,20 @@ public class Classroom {
     private Long id;
     private String name;
     private int capacity;
+    private String location;
 
     @OneToMany(mappedBy = "classroom")
-    private List<CourseSession> sessions;
+    @JsonManagedReference
+    private List<CourseSession> courseSessions;
 
-    public Classroom(){}
+    public Classroom() {}
 
-    public Classroom(Long id, String name, int capacity, List<CourseSession> sessions) {
+    public Classroom(Long id, String name, int capacity, String location, List<CourseSession> courseSessions) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
-        this.sessions = sessions;
+        this.location = location;
+        this.courseSessions = courseSessions;
     }
 
     public Long getId() {
@@ -49,11 +53,19 @@ public class Classroom {
         this.capacity = capacity;
     }
 
-    public List<CourseSession> getSessions() {
-        return sessions;
+    public String getLocation() {
+        return location;
     }
 
-    public void setSessions(List<CourseSession> sessions) {
-        this.sessions = sessions;
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public List<CourseSession> getCourseSessions() {
+        return courseSessions;
+    }
+
+    public void setCourseSessions(List<CourseSession> courseSessions) {
+        this.courseSessions = courseSessions;
     }
 }

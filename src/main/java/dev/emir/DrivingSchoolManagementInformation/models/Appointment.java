@@ -1,9 +1,9 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import dev.emir.DrivingSchoolManagementInformation.models.enums.AppointmentStatus;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,49 +15,52 @@ public class Appointment {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "student_id")
+    @JsonBackReference
     private Student student;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "instructor_id")
+    @JsonBackReference
     private Instructor instructor;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "course_session_id")
-    private CourseSession courseSession;
 
     @ManyToOne()
     @JoinColumn(name = "appointment_type_id")
+    @JsonBackReference
     private AppointmentType appointmentType;
+
+    @ManyToOne()
+    @JoinColumn(name = "course_session_id", nullable = true)
+    @JsonBackReference
+    private CourseSession courseSession;
 
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status = AppointmentStatus.PENDING;
 
     private LocalDateTime requestedAt = LocalDateTime.now();
+    
     @Column(nullable = false)
     private LocalDateTime appointmentTime;
 
-
     private LocalDateTime approvedAt;
-    public Appointment(){}
 
-    public Appointment(Long id, Student student, Instructor instructor, CourseSession courseSession, AppointmentType appointmentType, AppointmentStatus status, LocalDateTime requestedAt, LocalDateTime appointmentTime, LocalDateTime approvedAt) {
+    @ManyToOne
+    @JoinColumn(name = "approved_by")
+    @JsonBackReference
+    private User approvedBy;
+
+    public Appointment() {}
+
+    public Appointment(Long id, Student student, Instructor instructor, AppointmentType appointmentType, CourseSession courseSession, AppointmentStatus status, LocalDateTime requestedAt, LocalDateTime appointmentTime, LocalDateTime approvedAt, User approvedBy) {
         this.id = id;
         this.student = student;
         this.instructor = instructor;
-        this.courseSession = courseSession;
         this.appointmentType = appointmentType;
+        this.courseSession = courseSession;
         this.status = status;
         this.requestedAt = requestedAt;
         this.appointmentTime = appointmentTime;
         this.approvedAt = approvedAt;
-    }
-
-    public LocalDateTime getAppointmentTime() {
-        return appointmentTime;
-    }
-
-    public void setAppointmentTime(LocalDateTime appointmentTime) {
-        this.appointmentTime = appointmentTime;
+        this.approvedBy = approvedBy;
     }
 
     public Long getId() {
@@ -84,14 +87,6 @@ public class Appointment {
         this.instructor = instructor;
     }
 
-    public CourseSession getCourseSession() {
-        return courseSession;
-    }
-
-    public void setCourseSession(CourseSession courseSession) {
-        this.courseSession = courseSession;
-    }
-
     public AppointmentType getAppointmentType() {
         return appointmentType;
     }
@@ -116,11 +111,35 @@ public class Appointment {
         this.requestedAt = requestedAt;
     }
 
+    public LocalDateTime getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public void setAppointmentTime(LocalDateTime appointmentTime) {
+        this.appointmentTime = appointmentTime;
+    }
+
     public LocalDateTime getApprovedAt() {
         return approvedAt;
     }
 
     public void setApprovedAt(LocalDateTime approvedAt) {
         this.approvedAt = approvedAt;
+    }
+
+    public User getApprovedBy() {
+        return approvedBy;
+    }
+
+    public void setApprovedBy(User approvedBy) {
+        this.approvedBy = approvedBy;
+    }
+
+    public CourseSession getCourseSession() {
+        return courseSession;
+    }
+
+    public void setCourseSession(CourseSession courseSession) {
+        this.courseSession = courseSession;
     }
 }

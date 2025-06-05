@@ -65,16 +65,20 @@ public class ModelMappings {
         AppointmentType type = appointment.getAppointmentType();
         CourseSession courseSession = appointment.getCourseSession();
 
-
         AppointmentResponse responseData = new AppointmentResponse();
+        responseData.setId(appointment.getId());
         responseData.setStudentId(student.getId());
         responseData.setStudentName(student.getFullName());
         responseData.setInstructorId(instructor.getId());
         responseData.setInstructorName(instructor.getFullName());
-        responseData.setCourseSessionId(courseSession.getId());
-        responseData.setCourseName(courseSession.getCourse().getName());
         responseData.setAppointmentTypeId(type.getId());
         responseData.setAppointmentTypeName(type.getName());
+        
+        if (courseSession != null) {
+            responseData.setCourseSessionId(courseSession.getId());
+            responseData.setCourseName(courseSession.getCourse().getName());
+        }
+        
         responseData.setStatus(appointment.getStatus());
         responseData.setRequestedAt(appointment.getRequestedAt());
         responseData.setApprovedAt(appointment.getApprovedAt());

@@ -31,35 +31,25 @@ public class AppointmentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(@RequestBody AppointmentRequest request){
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> createAppointment(@RequestBody AppointmentRequest request) {
         Appointment created = appointmentService.createAppointment(request);
-
         AppointmentResponse responseData = ModelMappings.toAppointmentResponse(created);
-        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true,"Appointment created successfully", responseData);
+        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true, "Appointment created successfully", responseData);
         return ResponseEntity.ok(response);
     }
 
     // --------------------- UPDATE APPOINTMENT STATUS ------------------
     @PutMapping("/approve")
-    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
-    public ResponseEntity<ApiResponse<AppointmentResponse>> approveAppointment(
-            @RequestBody ApproveAppointmentRequest request
-    ){
-        Appointment appointment = appointmentService.approveAppointment(request.getAppointmentId(),request.getApproverId());
-        AppointmentResponse responseData = ModelMappings.toAppointmentResponse(appointment);
-        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true,"Appointment approved successfully", responseData);
-        return ResponseEntity.ok(response);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Appointment> approveAppointment(@RequestBody ApproveAppointmentRequest request) {
+        return ResponseEntity.ok(appointmentService.approveAppointment(request.getAppointmentId(), request.getApproverId()));
     }
 
     @PutMapping("/reject")
-    @PreAuthorize("hasAnyRole('EMPLOYEE','ADMIN')")
-    public ResponseEntity<ApiResponse<AppointmentResponse>> rejectAppointment(
-            @RequestBody AppointmentRejectRequets requets
-            ){
-        Appointment appointment = appointmentService.rejectAppointment(requets.getAppointmentId(), requets.getApproverId());
-        AppointmentResponse responseData = ModelMappings.toAppointmentResponse(appointment);
-        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true,"Appointment rejected successfully", responseData);
-        return ResponseEntity.ok(response);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Appointment> rejectAppointment(@RequestBody AppointmentRejectRequets request) {
+        return ResponseEntity.ok(appointmentService.rejectAppointment(request.getAppointmentId(), request.getApproverId()));
     }
 
     @PutMapping("/cancel")
@@ -70,6 +60,18 @@ public class AppointmentController {
         Appointment appointment = appointmentService.cancelAppointment(request.getAppointmentId(),request.getStudentId());
         AppointmentResponse responseData = ModelMappings.toAppointmentResponse(appointment);
         ApiResponse<AppointmentResponse>  response = new ApiResponse<>(true,"Appointment cancelled successfully",responseData);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<AppointmentResponse>> updateAppointment(
+            @PathVariable Long id,
+            @RequestBody AppointmentRequest request
+    ) {
+        Appointment updated = appointmentService.updateAppointment(id, request);
+        AppointmentResponse responseData = ModelMappings.toAppointmentResponse(updated);
+        ApiResponse<AppointmentResponse> response = new ApiResponse<>(true, "Appointment updated successfully", responseData);
         return ResponseEntity.ok(response);
     }
     // --------------------- UPDATE APPOINTMENT STATUS ------------------
@@ -136,4 +138,11 @@ public class AppointmentController {
         return ResponseEntity.ok(new ApiResponse<>(true, "Appointments fetched by status",appointmentResponses));
     }
     // --------------------- LIST APPOINTMENTS ------------------
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<ApiResponse<Void>> deleteAppointment(@PathVariable Long id) {
+        appointmentService.deleteAppointment(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Appointment deleted successfully", null));
+    }
 }

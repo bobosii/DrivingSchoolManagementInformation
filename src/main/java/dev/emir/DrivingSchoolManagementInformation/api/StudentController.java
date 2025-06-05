@@ -173,13 +173,20 @@ public class StudentController {
                                 appointment.getAppointmentTime(),
                                 appointment.getStatus().name(),
                                 appointment.getInstructor().getFirstName() + " " + appointment.getInstructor().getLastName(),
-                                appointment.getCourseSession().getCourse().getName(),
+                                "-",
                                 appointment.getAppointmentType() != null ? appointment.getAppointmentType().getName() : "-"
                         ))
                         .collect(Collectors.toList())
         );
 
         return ResponseEntity.ok(new ApiResponse<>(true, "Student details retrieved successfully", response));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR')")
+    public ResponseEntity<ApiResponse<List<Student>>> getAllStudents() {
+        List<Student> students = studentRepository.findAll();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Students retrieved successfully", students));
     }
 
     public boolean isCurrentUser(Long studentId) {

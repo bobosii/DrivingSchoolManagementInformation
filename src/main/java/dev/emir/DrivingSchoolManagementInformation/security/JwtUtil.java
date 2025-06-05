@@ -44,6 +44,14 @@ public class JwtUtil {
 
         Claims claims = Jwts.claims();
         claims.put("role", role);
+        
+        // User ID'yi claims'e ekle
+        if (userDetails instanceof org.springframework.security.core.userdetails.User) {
+            String username = userDetails.getUsername();
+            // User ID'yi username'den çıkar (örnek: "user_123" -> "123")
+            String userId = username.split("_")[1];
+            claims.put("id", Long.parseLong(userId));
+        }
 
         return Jwts
                 .builder()

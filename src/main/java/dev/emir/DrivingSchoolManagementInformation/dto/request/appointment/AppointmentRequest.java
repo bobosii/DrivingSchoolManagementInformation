@@ -1,22 +1,25 @@
 package dev.emir.DrivingSchoolManagementInformation.dto.request.appointment;
 
+import dev.emir.DrivingSchoolManagementInformation.models.enums.AppointmentStatus;
 import java.time.LocalDateTime;
 
 public class AppointmentRequest {
     private Long studentId;
     private Long instructorId;
-    private Long courseSessionId;
     private Long appointmentTypeId;
+    private Long courseSessionId;
     private LocalDateTime appointmentTime;
+    private AppointmentStatus status;
 
     public AppointmentRequest() {}
 
-    public AppointmentRequest(Long studentId, Long instructorId, Long courseSessionId, Long appointmentTypeId, LocalDateTime appointmentTime) {
+    public AppointmentRequest(Long studentId, Long instructorId, Long appointmentTypeId, Long courseSessionId, LocalDateTime appointmentTime, AppointmentStatus status) {
         this.studentId = studentId;
         this.instructorId = instructorId;
-        this.courseSessionId = courseSessionId;
         this.appointmentTypeId = appointmentTypeId;
+        this.courseSessionId = courseSessionId;
         this.appointmentTime = appointmentTime;
+        this.status = status;
     }
 
     public Long getStudentId() {
@@ -35,14 +38,6 @@ public class AppointmentRequest {
         this.instructorId = instructorId;
     }
 
-    public Long getCourseSessionId() {
-        return courseSessionId;
-    }
-
-    public void setCourseSessionId(Long courseSessionId) {
-        this.courseSessionId = courseSessionId;
-    }
-
     public Long getAppointmentTypeId() {
         return appointmentTypeId;
     }
@@ -51,11 +46,27 @@ public class AppointmentRequest {
         this.appointmentTypeId = appointmentTypeId;
     }
 
+    public Long getCourseSessionId() {
+        return courseSessionId;
+    }
+
+    public void setCourseSessionId(Long courseSessionId) {
+        this.courseSessionId = courseSessionId;
+    }
+
     public LocalDateTime getAppointmentTime() {
         return appointmentTime;
     }
 
     public void setAppointmentTime(LocalDateTime appointmentTime) {
         this.appointmentTime = appointmentTime;
+    }
+
+    public AppointmentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(AppointmentStatus status) {
+        this.status = status;
     }
 }
