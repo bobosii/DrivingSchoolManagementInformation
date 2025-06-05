@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useAuth } from "../context/AuthContext";
 
 interface ProtectedRouteProps {
     children: ReactNode | ((props: { role: string }) => ReactNode);
@@ -7,30 +8,21 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
-    const token = localStorage.getItem("token");
+    const { isAuthenticated, userRole } = useAuth();
 
-    if (!token) {
+    if (!isAuthenticated) {
         return <Navigate to={"/login"} replace />;
     }
 
-    try {
-        const decodedToken = JSON.parse(atob(token.split(".")[1]));
-        const userRole = decodedToken.role;
-
-        if (!allowedRoles.includes(userRole)) {
-            return <Navigate to={"/unauthorized"} replace />;
-        }
-
-        if (typeof children === "function") {
-            return <>{children({ role: userRole })}</>;
-        }
-
-        return <>{children}</>;
-    } catch (err) {
-        console.log(err);
-        localStorage.removeItem("token");
-        return <Navigate to={"/login"} replace />;
+    if (!userRole || !allowedRoles.includes(userRole)) {
+        return <Navigate to={"/unauthorized"} replace />;
     }
+
+    if (typeof children === "function") {
+        return <>{children({ role: userRole })}</>;
+    }
+
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;
