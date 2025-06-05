@@ -11,6 +11,7 @@ import EmployeeDashboard from "../pages/EmployeeDashboard";
 import AppointmentsPage from "../pages/appointmentPage/AppointmentsPage";
 import EmployeeProfile from "../pages/profile/EmployeeProfile";
 import UsersPage from "../pages/UsersPage";
+import VehiclesPage from "../pages/VehiclesPage";
 
 export const router = createBrowserRouter([
   {
@@ -104,7 +105,7 @@ export const router = createBrowserRouter([
         path: "/vehicles",
         element: (
           <ProtectedRoute allowedRoles={["ADMIN", "INSTRUCTOR"]}>
-            <div>Vehicles Page</div>
+            <VehiclesPage />
           </ProtectedRoute>
         ),
       },

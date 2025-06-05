@@ -27,12 +27,16 @@ public class TestInitializer implements CommandLineRunner {
     @Autowired private final CourseSessionRepository courseSessionRepository;
     @Autowired private final AppointmentTypeRepository appointmentTypeRepository;
     @Autowired private final AppointmentRepository appointmentRepository;
+    @Autowired private final VehicleTypeRepository vehicleTypeRepository;
+    @Autowired private final VehicleRepository vehicleRepository;
+    @Autowired private final LicenseClassRepository licenseClassRepository;
 
     public TestInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder, StudentRepository studentRepository,
                            InstructorRepository instructorRepository, EmployeeRepository employeeRepository,
                            CourseRepository courseRepository, ClassroomRepository classroomRepository,
                            CourseSessionRepository courseSessionRepository, AppointmentTypeRepository appointmentTypeRepository,
-                           AppointmentRepository appointmentRepository) {
+                           AppointmentRepository appointmentRepository, VehicleTypeRepository vehicleTypeRepository,
+                           VehicleRepository vehicleRepository, LicenseClassRepository licenseClassRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.studentRepository = studentRepository;
@@ -43,6 +47,9 @@ public class TestInitializer implements CommandLineRunner {
         this.courseSessionRepository = courseSessionRepository;
         this.appointmentTypeRepository = appointmentTypeRepository;
         this.appointmentRepository = appointmentRepository;
+        this.vehicleTypeRepository = vehicleTypeRepository;
+        this.vehicleRepository = vehicleRepository;
+        this.licenseClassRepository = licenseClassRepository;
     }
 
     @Override
@@ -70,6 +77,41 @@ public class TestInitializer implements CommandLineRunner {
         AppointmentType drivingType = createAppointmentTypeIfNotExists("DRIVING");
 
         createAppointmentIfNotExists(student, instructor, session, simType);
+
+        // Create vehicle types
+        VehicleType otomobil = createVehicleTypeIfNotExists("Otomobil");
+        VehicleType otobus = createVehicleTypeIfNotExists("Otobüs");
+        VehicleType tir = createVehicleTypeIfNotExists("TIR");
+        VehicleType motosiklet = createVehicleTypeIfNotExists("Motosiklet");
+        VehicleType kamyon = createVehicleTypeIfNotExists("Kamyon");
+        VehicleType minibus = createVehicleTypeIfNotExists("Minibüs");
+
+        // Create sample vehicles
+        createVehicleIfNotExists("34ABC123", "Toyota", true, otomobil);
+        createVehicleIfNotExists("34DEF456", "Mercedes", false, otobus);
+        createVehicleIfNotExists("34GHI789", "Volvo", false, tir);
+        createVehicleIfNotExists("34JKL012", "Honda", false, motosiklet);
+        createVehicleIfNotExists("34MNO345", "MAN", false, kamyon);
+        createVehicleIfNotExists("34PRS678", "Ford", true, minibus);
+
+        // Create license classes
+        createLicenseClassIfNotExists("A", "Motosiklet");
+        createLicenseClassIfNotExists("A1", "Hafif Motosiklet");
+        createLicenseClassIfNotExists("A2", "Orta Sınıf Motosiklet");
+        createLicenseClassIfNotExists("B", "Otomobil");
+        createLicenseClassIfNotExists("B1", "Hafif Araç");
+        createLicenseClassIfNotExists("C", "Kamyon");
+        createLicenseClassIfNotExists("C1", "Hafif Kamyon");
+        createLicenseClassIfNotExists("D", "Otobüs");
+        createLicenseClassIfNotExists("D1", "Minibüs");
+        createLicenseClassIfNotExists("BE", "Römorklu Otomobil");
+        createLicenseClassIfNotExists("C1E", "Römorklu Hafif Kamyon");
+        createLicenseClassIfNotExists("CE", "Römorklu Kamyon");
+        createLicenseClassIfNotExists("D1E", "Römorklu Minibüs");
+        createLicenseClassIfNotExists("DE", "Römorklu Otobüs");
+        createLicenseClassIfNotExists("M", "Moped");
+        createLicenseClassIfNotExists("T", "Traktör");
+        createLicenseClassIfNotExists("F", "Engelli Araçları");
     }
 
     private User createUserIfNotExists(String username, String rawPassword, Role role) {
@@ -197,5 +239,39 @@ public class TestInitializer implements CommandLineRunner {
             a.setStatus(AppointmentStatus.PENDING);
             appointmentRepository.save(a);
         }
+    }
+
+    private VehicleType createVehicleTypeIfNotExists(String name) {
+        return vehicleTypeRepository.findAll().stream()
+                .filter(t -> t.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseGet(() -> {
+                    VehicleType type = new VehicleType();
+                    type.setName(name);
+                    return vehicleTypeRepository.save(type);
+                });
+    }
+
+    private void createVehicleIfNotExists(String plate, String brand, boolean automatic, VehicleType type) {
+        if (vehicleRepository.findByPlate(plate).isEmpty()) {
+            Vehicle vehicle = new Vehicle();
+            vehicle.setPlate(plate);
+            vehicle.setBrand(brand);
+            vehicle.setAutomatic(automatic);
+            vehicle.setInspectionDate(LocalDate.now().plusMonths(6));
+            vehicle.setInsuranceDate(LocalDate.now().plusYears(1));
+            vehicle.setVehicleType(type);
+            vehicleRepository.save(vehicle);
+        }
+    }
+
+    private LicenseClass createLicenseClassIfNotExists(String code, String description) {
+        return licenseClassRepository.findByCode(code)
+                .orElseGet(() -> {
+                    LicenseClass licenseClass = new LicenseClass();
+                    licenseClass.setCode(code);
+                    licenseClass.setDescription(description);
+                    return licenseClassRepository.save(licenseClass);
+                });
     }
 }

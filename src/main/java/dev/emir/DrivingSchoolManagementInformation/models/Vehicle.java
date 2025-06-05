@@ -12,6 +12,7 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String plate;
+    private String brand;
     private boolean automatic;
     private LocalDate inspectionDate;
     private LocalDate insuranceDate;
@@ -29,9 +30,10 @@ public class Vehicle {
 
     public Vehicle(){}
 
-    public Vehicle(Long id, String plate, boolean automatic, LocalDate inspectionDate, LocalDate insuranceDate, VehicleType vehicleType, List<LicenseClass> licenseClasses) {
+    public Vehicle(Long id, String plate, String brand, boolean automatic, LocalDate inspectionDate, LocalDate insuranceDate, VehicleType vehicleType, List<LicenseClass> licenseClasses) {
         this.id = id;
         this.plate = plate;
+        this.brand = brand;
         this.automatic = automatic;
         this.inspectionDate = inspectionDate;
         this.insuranceDate = insuranceDate;
@@ -53,6 +55,14 @@ public class Vehicle {
 
     public void setPlate(String plate) {
         this.plate = plate;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
     public boolean isAutomatic() {
