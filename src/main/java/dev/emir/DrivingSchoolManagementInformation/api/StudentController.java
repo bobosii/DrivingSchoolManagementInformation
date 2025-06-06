@@ -183,10 +183,21 @@ public class StudentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR')")
-    public ResponseEntity<ApiResponse<List<Student>>> getAllStudents() {
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR') or hasRole('STUDENT')")
+    public ResponseEntity<ApiResponse<List<StudentDetailResponse>>> getAllStudents() {
         List<Student> students = studentRepository.findAll();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Students retrieved successfully", students));
+        List<StudentDetailResponse> studentResponses = students.stream()
+            .map(student -> new StudentDetailResponse(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                student.getBirthDate().atStartOfDay(),
+                student.getTerm() != null ? student.getTerm().getName() : null,
+                null
+            ))
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenciler başarıyla getirildi", studentResponses));
     }
 
     public boolean isCurrentUser(Long studentId) {

@@ -314,7 +314,7 @@ const AppointmentsPage = () => {
                                     <option value="">Select Student</option>
                                     {students.map((student) => (
                                         <option key={student.id} value={student.id}>
-                                            {student.firstName} {student.lastName}
+                                            {student.fullName}
                                         </option>
                                     ))}
                                 </select>

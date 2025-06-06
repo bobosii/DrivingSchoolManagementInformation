@@ -49,7 +49,7 @@ const menuItems: MenuItem[] = [
         icon: FileText,
         label: 'Belgeler',
         path: '/documents',
-        roles: ['ADMIN', 'STUDENT', 'EMPLOYEE'],
+        roles: ['ADMIN', 'EMPLOYEE'],
     },
     {
         icon: BookOpen,

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from '../api/axios';
 
 export interface Instructor {
     id: number;
@@ -8,26 +8,11 @@ export interface Instructor {
 }
 
 export const getAllInstructors = async (): Promise<Instructor[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        throw new Error("No token found");
-    }
-
     try {
-        console.log("Token being sent:", token); // Debug log
-        const res = await axios.get("http://localhost:8080/api/instructors", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        console.log("Response:", res.data); // Debug log
-        return res.data.data;
+        const response = await axios.get('/instructors');
+        return response.data.data;
     } catch (error) {
-        console.error("Error fetching instructors:", error);
-        if (axios.isAxiosError(error)) {
-            console.error("Response data:", error.response?.data); // Debug log
-            console.error("Response status:", error.response?.status); // Debug log
-        }
-        throw error;
+        console.error('Error fetching instructors:', error);
+        throw new Error('Eğitmenler alınırken bir hata oluştu');
     }
 }; 

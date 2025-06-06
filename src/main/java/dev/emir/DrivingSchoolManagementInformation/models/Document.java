@@ -8,18 +8,28 @@ public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     private String type;
-    private String filePath;
+    private String fileName;
+    private String fileType;
+    private Long fileSize;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] fileData;
 
     @ManyToOne
     private Student student;
 
     public Document(){}
 
-    public Document(Long id, String type, String filePath, Student student) {
+    public Document(Long id, String type, String fileName, String fileType, Long fileSize, byte[] fileData, Student student) {
         this.id = id;
         this.type = type;
-        this.filePath = filePath;
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.fileSize = fileSize;
+        this.fileData = fileData;
         this.student = student;
     }
 
@@ -39,12 +49,36 @@ public class Document {
         this.type = type;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public byte[] getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(byte[] fileData) {
+        this.fileData = fileData;
     }
 
     public Student getStudent() {

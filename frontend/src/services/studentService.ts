@@ -1,29 +1,28 @@
-import axios from "axios";
+import axios from '../api/axios';
 
 export interface Student {
     id: number;
     firstName: string;
     lastName: string;
-    fullName: string;
     email: string;
     birthDate: string;
+    termName: string | null;
+    fullName: string;
 }
 
 export const getAllStudents = async (): Promise<Student[]> => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        throw new Error("No token found");
-    }
-
     try {
-        const response = await axios.get("http://localhost:8080/api/student", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        return response.data.data;
+        const response = await axios.get('/student');
+        return response.data.data.map((student: any) => ({
+            ...student,
+            fullName: `${student.firstName} ${student.lastName}`
+        }));
     } catch (error) {
-        console.error("Error fetching students:", error);
-        throw error;
+        console.error('Error fetching students:', error);
+        throw new Error('Öğrenciler alınırken bir hata oluştu');
     }
+};
+
+export const studentService = {
+    getAllStudents,
 }; 

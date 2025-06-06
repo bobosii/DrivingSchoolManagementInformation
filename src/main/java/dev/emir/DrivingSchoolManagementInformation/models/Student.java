@@ -35,18 +35,23 @@ public class Student {
     private List<LicenseClass> requestedLicenseClasses;
 
     @OneToMany(mappedBy = "student")
+    @JsonIgnore
     private List<Document> documents;
 
     @OneToMany(mappedBy = "student")
+    @JsonIgnore
     private List<Appointment> appointments;
 
     @OneToMany(mappedBy = "student")
+    @JsonIgnore
     private List<StudentExam> exams;
 
     @ManyToMany
+    @JsonIgnore
     private List<CourseSession> courseSessions;
 
     @ManyToMany
+    @JsonIgnore
     private List<SimulatorSession> simulatorSessions;
 
     public Student(){}
