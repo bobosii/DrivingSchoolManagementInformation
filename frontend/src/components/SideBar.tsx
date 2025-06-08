@@ -14,6 +14,7 @@ import {
     Clock,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { FaUsers, FaCalendarAlt, FaCar, FaFileAlt, FaChalkboardTeacher, FaGraduationCap, FaBuilding } from 'react-icons/fa';
 
 interface MenuItem {
     icon: React.ComponentType<any>;
@@ -70,6 +71,12 @@ const menuItems: MenuItem[] = [
         label: 'Dönemler',
         path: '/terms',
         roles: ['ADMIN', 'EMPLOYEE'],
+    },
+    {
+        icon: FaBuilding,
+        label: 'Sınıflar',
+        path: '/classrooms',
+        roles: ['ADMIN', 'EMPLOYEE', 'INSTRUCTOR', 'STUDENT']
     },
 ];
 

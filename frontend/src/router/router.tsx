@@ -14,6 +14,7 @@ import UsersPage from "../pages/UsersPage";
 import VehiclesPage from "../pages/VehiclesPage";
 import DocumentsPage from "../pages/DocumentsPage";
 import TermsPage from "../pages/TermsPage";
+import ClassroomsPage from '../pages/ClassroomsPage';
 
 export const router = createBrowserRouter([
   {
@@ -41,7 +42,7 @@ export const router = createBrowserRouter([
                 case "EMPLOYEE":
                   return <EmployeeDashboard />;
                 case "INSTRUCTOR":
-                  return <InstructorDashboard />;
+                  return <InstructorDashboard />
                 case "STUDENT":
                   return <StudentDashboard />;
                 default:
@@ -152,6 +153,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE"]}>
             <TermsPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "/classrooms",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "INSTRUCTOR", "STUDENT"]}>
+            <ClassroomsPage />
           </ProtectedRoute>
         )
       }
