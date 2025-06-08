@@ -13,8 +13,13 @@ import EmployeeProfile from "../pages/profile/EmployeeProfile";
 import UsersPage from "../pages/UsersPage";
 import VehiclesPage from "../pages/VehiclesPage";
 import DocumentsPage from "../pages/DocumentsPage";
+import TermsPage from "../pages/TermsPage";
 
 export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Login />
+  },
   {
     path: "/",
     element: <AppLayout />,
@@ -142,6 +147,14 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "/terms",
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE"]}>
+            <TermsPage />
+          </ProtectedRoute>
+        )
+      }
     ],
   },
 ]);

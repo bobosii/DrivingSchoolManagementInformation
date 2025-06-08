@@ -9,6 +9,10 @@ public class UserResponse {
     private String lastName;
     private String email;
     private String birthDate;
+    private Long termId;
+    private String termName;
+
+    public UserResponse() {}
 
     public UserResponse(Long id, String username, String fullName, String role, String firstName, String lastName, String email, String birthDate) {
         this.id = id;
@@ -84,5 +88,21 @@ public class UserResponse {
 
     public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public Long getTermId() {
+        return termId;
+    }
+
+    public void setTermId(Long termId) {
+        this.termId = termId;
+    }
+
+    public String getTermName() {
+        return termName;
+    }
+
+    public void setTermName(String termName) {
+        this.termName = termName;
     }
 }

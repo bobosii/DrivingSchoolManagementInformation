@@ -11,7 +11,9 @@ import {
     LogOut,
     User,
     ClipboardList,
+    Clock,
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface MenuItem {
     icon: React.ComponentType<any>;
@@ -63,6 +65,12 @@ const menuItems: MenuItem[] = [
         path: '/exams',
         roles: ['ADMIN', 'STUDENT', 'EMPLOYEE'],
     },
+    {
+        icon: Clock,
+        label: 'Dönemler',
+        path: '/terms',
+        roles: ['ADMIN', 'EMPLOYEE'],
+    },
 ];
 
 const Sidebar = () => {
@@ -70,6 +78,7 @@ const Sidebar = () => {
     const location = useLocation();
     const [userRole, setUserRole] = useState<string | null>(null);
     const [userName, setUserName] = useState<string>('');
+    const { logout } = useAuth();
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -85,8 +94,7 @@ const Sidebar = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/login");
+        logout();
     };
 
     const filteredMenuItems = menuItems.filter((item) =>

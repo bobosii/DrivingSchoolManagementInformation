@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../services/userService";
-import type { User } from "../types/user";
-import axios from "axios";
+import { getAllUsers, searchUsers } from "../services/userService";
+import type { User } from "../services/userService";
 import type { StudentDetail } from "../types/StudentDetail";
 import { useSearch } from "../context/SearchContext";
+import { getAllTerms } from '../services/termService';
+import type { Term } from '../services/termService';
+import { Edit, Trash2, Eye } from 'lucide-react';
+import axios from "../api/axios";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
+    const [terms, setTerms] = useState<Term[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -28,38 +32,30 @@ export default function UsersPage() {
     const { searchTerm } = useSearch();
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const data = await getAllUsers();
-                setUsers(data);
-                setFilteredUsers(data);
-            } catch (err) {
-                setError("Failed to load users");
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUsers();
+        fetchData();
     }, []);
 
     useEffect(() => {
-        let filtered = users;
-        if (selectedRole !== "ALL") {
-            filtered = filtered.filter(user => user.role === selectedRole);
-        }
-        if (searchTerm.trim() !== "") {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(user =>
-                user.username.toLowerCase().includes(term) ||
-                (user.fullName && user.fullName.toLowerCase().includes(term)) ||
-                (user.firstName && user.firstName.toLowerCase().includes(term)) ||
-                (user.lastName && user.lastName.toLowerCase().includes(term))
-            );
-        }
+        const filtered = searchUsers(users, searchTerm);
         setFilteredUsers(filtered);
-    }, [selectedRole, users, searchTerm]);
+    }, [searchTerm, users]);
+
+    const fetchData = async () => {
+        try {
+            const [usersData, termsData] = await Promise.all([
+                getAllUsers(),
+                getAllTerms()
+            ]);
+            setUsers(usersData);
+            setFilteredUsers(usersData);
+            setTerms(termsData);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setError('Veriler alınırken bir hata oluştu');
+            setLoading(false);
+        }
+    };
 
     const handleViewDetails = async (user: User) => {
         setSelectedUser(user);
@@ -203,6 +199,12 @@ export default function UsersPage() {
         }
     };
 
+    const getTermName = (termId: number | null) => {
+        if (!termId) return 'Atanmamış';
+        const term = terms.find(t => t.id === termId);
+        return term ? term.name : 'Atanmamış';
+    };
+
     if (loading) {
         return (
             <div className="p-6">
@@ -224,31 +226,26 @@ export default function UsersPage() {
     }
 
     return (
-        <div className="p-6">
+        <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold">Users</h1>
-                <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
-                    <button
-                        onClick={() => setIsAddModalOpen(true)}
-                        className="bg-red-600 text-white px-4 py-2 rounded-md font-medium hover:bg-red-700 transition-colors"
-                    >
-                        Kullanıcı Ekle
-                    </button>
-                    <label htmlFor="roleFilter" className="text-sm font-medium text-gray-700">
-                        Filter by Role:
-                    </label>
+                <div className="flex gap-4">
                     <select
-                        id="roleFilter"
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value)}
-                        className="mt-1 block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md"
+                        className="p-2 border rounded"
                     >
-                        <option value="ALL">All Roles</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="EMPLOYEE">Employee</option>
-                        <option value="INSTRUCTOR">Instructor</option>
-                        <option value="STUDENT">Student</option>
+                        <option value="ALL">Tüm Roller</option>
+                        <option value="STUDENT">Öğrenci</option>
+                        <option value="INSTRUCTOR">Eğitmen</option>
+                        <option value="EMPLOYEE">Personel</option>
                     </select>
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Yeni Kullanıcı Ekle
+                    </button>
                 </div>
             </div>
             <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -266,6 +263,9 @@ export default function UsersPage() {
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Role
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Term
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Actions
@@ -292,6 +292,9 @@ export default function UsersPage() {
                                         'bg-gray-100 text-gray-800'}`}>
                                         {user.role}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    {user.role === 'STUDENT' && user.termId ? getTermName(user.termId) : '-'}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <button
@@ -364,7 +367,7 @@ export default function UsersPage() {
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Term</label>
-                                                <p className="mt-1 text-sm text-gray-900">{studentDetail.termName}</p>
+                                                <p className="mt-1 text-sm text-gray-900">{getTermName(studentDetail.termId)}</p>
                                             </div>
                                         </div>
 

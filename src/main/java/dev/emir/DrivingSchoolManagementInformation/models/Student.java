@@ -24,6 +24,7 @@ public class Student {
     private User user;
 
     @ManyToOne
+    @JsonBackReference
     private Term term;
 
     @ManyToMany

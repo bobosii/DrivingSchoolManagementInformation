@@ -1,10 +1,8 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import dev.emir.DrivingSchoolManagementInformation.models.enums.Month;
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -13,32 +11,29 @@ public class Term {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private LocalDate startDate;
-    private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
+    private Month month;
+    
+    private int year;
     private int quota;
 
     @OneToMany(mappedBy = "term")
+    @JsonManagedReference
     private List<Student> students;
 
-    public Term(){
-    }
+    public Term() {}
 
-    public Term(Long id, String name, LocalDate startDate, LocalDate endDate, int quota, List<Student> students) {
+    public Term(Long id, Month month, int year, int quota, List<Student> students) {
         this.id = id;
-        this.name = name;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.month = month;
+        this.year = year;
         this.quota = quota;
         this.students = students;
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        return year + " " + month.getDisplayName();
     }
 
     public Long getId() {
@@ -49,20 +44,20 @@ public class Term {
         this.id = id;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public Month getMonth() {
+        return month;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public void setMonth(Month month) {
+        this.month = month;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public int getYear() {
+        return year;
     }
 
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setYear(int year) {
+        this.year = year;
     }
 
     public int getQuota() {

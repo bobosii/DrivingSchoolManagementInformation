@@ -14,6 +14,8 @@ public class Feedback {
     private int rating; // 1 to 5
     private LocalDateTime submittedAt;
 
+    public Feedback(){}
+
     @ManyToOne
     private Student student;
 

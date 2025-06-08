@@ -130,43 +130,40 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         List<User> users = userRepository.findAll();
-        List<UserResponse> userResponses = users.stream()
-                .map(user -> {
-                    String firstName = "";
-                    String lastName = "";
-                    String email = "";
-                    String birthDate = "";
-                    if (user.getStudent() != null) {
-                        firstName = user.getStudent().getFirstName();
-                        lastName = user.getStudent().getLastName();
-                        email = user.getStudent().getEmail();
-                        birthDate = user.getStudent().getBirthDate() != null ? user.getStudent().getBirthDate().toString() : "";
-                    } else if (user.getInstructor() != null) {
-                        firstName = user.getInstructor().getFirstName();
-                        lastName = user.getInstructor().getLastName();
-                        email = user.getInstructor().getEmail();
-                        birthDate = user.getInstructor().getBirthDate() != null ? user.getInstructor().getBirthDate().toString() : "";
-                    } else if (user.getEmployee() != null) {
-                        firstName = user.getEmployee().getFirstName();
-                        lastName = user.getEmployee().getLastName();
-                        email = user.getEmployee().getEmail();
-                        birthDate = user.getEmployee().getBirthDate() != null ? user.getEmployee().getBirthDate().toString() : "";
-                    }
-                    String fullName = (firstName + " " + lastName).trim();
-                    return new UserResponse(
-                            user.getId(),
-                            user.getUsername(),
-                            fullName,
-                            user.getRole().name(),
-                            firstName,
-                            lastName,
-                            email,
-                            birthDate
-                    );
-                })
-                .collect(Collectors.toList());
+        List<UserResponse> userResponses = users.stream().map(user -> {
+            UserResponse response = new UserResponse();
+            response.setId(user.getId());
+            response.setUsername(user.getUsername());
+            response.setRole(user.getRole().toString());
 
-        return ResponseEntity.ok(new ApiResponse<>(true, "Users retrieved successfully", userResponses));
+            if (user.getStudent() != null) {
+                response.setFirstName(user.getStudent().getFirstName());
+                response.setLastName(user.getStudent().getLastName());
+                response.setEmail(user.getStudent().getEmail());
+                response.setBirthDate(user.getStudent().getBirthDate() != null ? user.getStudent().getBirthDate().toString() : null);
+                response.setFullName(user.getStudent().getFullName());
+                if (user.getStudent().getTerm() != null) {
+                    response.setTermId(user.getStudent().getTerm().getId());
+                    response.setTermName(user.getStudent().getTerm().getName());
+                }
+            } else if (user.getInstructor() != null) {
+                response.setFirstName(user.getInstructor().getFirstName());
+                response.setLastName(user.getInstructor().getLastName());
+                response.setEmail(user.getInstructor().getEmail());
+                response.setBirthDate(user.getInstructor().getBirthDate() != null ? user.getInstructor().getBirthDate().toString() : null);
+                response.setFullName(user.getInstructor().getFullName());
+            } else if (user.getEmployee() != null) {
+                response.setFirstName(user.getEmployee().getFirstName());
+                response.setLastName(user.getEmployee().getLastName());
+                response.setEmail(user.getEmployee().getEmail());
+                response.setBirthDate(user.getEmployee().getBirthDate() != null ? user.getEmployee().getBirthDate().toString() : null);
+                response.setFullName(user.getEmployee().getFullName());
+            }
+
+            return response;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(new ApiResponse<>(true, "Kullanıcılar başarıyla getirildi", userResponses));
     }
 
     @PostMapping("/users")

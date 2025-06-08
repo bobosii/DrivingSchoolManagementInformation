@@ -1,9 +1,11 @@
 export interface StudentDetail {
     id: number;
+    username: string;
     firstName: string;
     lastName: string;
     email: string;
     birthDate: string;
+    termId: number;
     termName: string;
     appointments: {
         id: number;

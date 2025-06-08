@@ -1,38 +1,28 @@
 package dev.emir.DrivingSchoolManagementInformation.dto.request.term;
 
-import java.time.LocalDate;
+import dev.emir.DrivingSchoolManagementInformation.models.enums.Month;
 
 public class CreateTermRequest {
-
-    private String name;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private Month month;
+    private int year;
     private int quota;
 
     public CreateTermRequest() {}
 
-    public String getName() {
-        return name;
+    public Month getMonth() {
+        return month;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMonth(Month month) {
+        this.month = month;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public int getYear() {
+        return year;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setYear(int year) {
+        this.year = year;
     }
 
     public int getQuota() {
