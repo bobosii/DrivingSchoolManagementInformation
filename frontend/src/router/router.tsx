@@ -15,6 +15,7 @@ import VehiclesPage from "../pages/VehiclesPage";
 import DocumentsPage from "../pages/DocumentsPage";
 import TermsPage from "../pages/TermsPage";
 import ClassroomsPage from '../pages/ClassroomsPage';
+import ExamsPage from '../pages/ExamsPage';
 
 export const router = createBrowserRouter([
   {
@@ -42,7 +43,7 @@ export const router = createBrowserRouter([
                 case "EMPLOYEE":
                   return <EmployeeDashboard />;
                 case "INSTRUCTOR":
-                  return <InstructorDashboard />
+                  return <InstructorDashboard />;
                 case "STUDENT":
                   return <StudentDashboard />;
                 default:
@@ -69,14 +70,6 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/employee/profile",
-        element: (
-          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
-            <EmployeeProfile />
-          </ProtectedRoute>
-        ),
-      },
-      {
         path: "/instructor",
         element: (
           <ProtectedRoute allowedRoles={["INSTRUCTOR"]}>
@@ -89,6 +82,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={["STUDENT"]}>
             <StudentDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/employee/profile",
+        element: (
+          <ProtectedRoute allowedRoles={["EMPLOYEE"]}>
+            <EmployeeProfile />
           </ProtectedRoute>
         ),
       },
@@ -135,8 +136,8 @@ export const router = createBrowserRouter([
       {
         path: "/exams",
         element: (
-          <ProtectedRoute allowedRoles={["ADMIN", "STUDENT", "EMPLOYEE"]}>
-            <div>Exams Page</div>
+          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "INSTRUCTOR", "STUDENT"]}>
+            <ExamsPage />
           </ProtectedRoute>
         ),
       },

@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import axios from '../api/axios';
 
 interface DecodedToken {
     sub: string;
@@ -9,11 +8,21 @@ interface DecodedToken {
     exp: number;
 }
 
+interface User {
+    id: number;
+    username: string;
+    role: string;
+}
+
 interface AuthContextType {
     isAuthenticated: boolean;
     isAdmin: boolean;
+    isEmployee: boolean;
+    isInstructor: boolean;
+    isStudent: boolean;
     userId: number | null;
     userRole: string | null;
+    user: User | null;
     checkAuth: () => void;
     logout: () => void;
 }
@@ -23,58 +32,85 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isAdmin, setIsAdmin] = useState<boolean>(false);
+    const [isEmployee, setIsEmployee] = useState<boolean>(false);
+    const [isInstructor, setIsInstructor] = useState<boolean>(false);
+    const [isStudent, setIsStudent] = useState<boolean>(false);
     const [userId, setUserId] = useState<number | null>(null);
     const [userRole, setUserRole] = useState<string | null>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     const checkAuth = () => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token) {
             try {
-                console.log("Raw token:", token); // Debug için
-                const decodedToken = jwtDecode<DecodedToken>(token);
-                console.log("Decoded token:", decodedToken); // Debug için
-                
-                setIsAuthenticated(true);
-                
-                // Admin rolü kontrolünü düzelt
-                const isUserAdmin = decodedToken.role === 'ADMIN';
-                console.log("Is user admin:", isUserAdmin); // Debug için
-                setIsAdmin(isUserAdmin);
-                
-                // ID'yi doğrudan token'dan al
-                if (decodedToken.id) {
-                    console.log("Setting userId from token:", decodedToken.id); // Debug için
-                    setUserId(decodedToken.id);
+                const decoded = JSON.parse(atob(token.split(".")[1]));
+                const currentTime = Date.now() / 1000;
+
+                if (decoded.exp > currentTime) {
+                    setIsAuthenticated(true);
+                    setIsAdmin(decoded.role === "ADMIN");
+                    setIsEmployee(decoded.role === "EMPLOYEE");
+                    setIsInstructor(decoded.role === "INSTRUCTOR");
+                    setIsStudent(decoded.role === "STUDENT");
+                    setUserId(decoded.id);
+                    setUserRole(decoded.role);
+                    setUser({
+                        id: decoded.id,
+                        username: decoded.sub,
+                        role: decoded.role
+                    });
                 } else {
-                    console.log("No id found in token"); // Debug için
+                    localStorage.removeItem("token");
+                    setIsAuthenticated(false);
+                    setIsAdmin(false);
+                    setIsEmployee(false);
+                    setIsInstructor(false);
+                    setIsStudent(false);
                     setUserId(null);
+                    setUserRole(null);
+                    setUser(null);
                 }
-                
-                setUserRole(decodedToken.role);
-            } catch (error) {
-                console.error('Error decoding token:', error);
-                logout();
+            } catch {
+                localStorage.removeItem("token");
+                setIsAuthenticated(false);
+                setIsAdmin(false);
+                setIsEmployee(false);
+                setIsInstructor(false);
+                setIsStudent(false);
+                setUserId(null);
+                setUserRole(null);
+                setUser(null);
             }
         } else {
-            console.log("No token found"); // Debug için
-            logout();
+            setIsAuthenticated(false);
+            setIsAdmin(false);
+            setIsEmployee(false);
+            setIsInstructor(false);
+            setIsStudent(false);
+            setUserId(null);
+            setUserRole(null);
+            setUser(null);
         }
-    };
-
-    const logout = () => {
-        localStorage.removeItem('token');
-        setIsAuthenticated(false);
-        setIsAdmin(false);
-        setUserId(null);
-        setUserRole(null);
     };
 
     useEffect(() => {
         checkAuth();
     }, []);
 
+    const logout = () => {
+        localStorage.removeItem("token");
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+        setIsEmployee(false);
+        setIsInstructor(false);
+        setIsStudent(false);
+        setUserId(null);
+        setUserRole(null);
+        setUser(null);
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, isAdmin, userId, userRole, checkAuth, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, isAdmin, isEmployee, isInstructor, isStudent, userId, userRole, user, checkAuth, logout }}>
             {children}
         </AuthContext.Provider>
     );
@@ -83,7 +119,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (context === undefined) {
-        throw new Error('useAuth must be used within an AuthProvider');
+        throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;
 }; 

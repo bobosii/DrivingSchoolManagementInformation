@@ -1,32 +1,15 @@
-package dev.emir.DrivingSchoolManagementInformation.models;
-
-import jakarta.persistence.*;
+package dev.emir.DrivingSchoolManagementInformation.dto.response;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Entity
-@Table(name = "exam")
-public class Exam {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class ExamResponse {
     private Long id;
-
     private String title;
     private String description;
     private LocalDate examDate;
     private String fileName;
     private String fileType;
     private Long fileSize;
-
-    @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    private byte[] fileData;
-
-    @OneToMany(mappedBy = "exam")
-    private List<StudentExam> results;
-
-    public Exam() {}
 
     public Long getId() {
         return id;
@@ -83,20 +66,4 @@ public class Exam {
     public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
-
-    public byte[] getFileData() {
-        return fileData;
-    }
-
-    public void setFileData(byte[] fileData) {
-        this.fileData = fileData;
-    }
-
-    public List<StudentExam> getResults() {
-        return results;
-    }
-
-    public void setResults(List<StudentExam> results) {
-        this.results = results;
-    }
-}
+} 

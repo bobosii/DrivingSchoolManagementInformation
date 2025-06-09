@@ -13,6 +13,23 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    public ApiResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
+
+    public static ApiResponse success(Object data) {
+        return new ApiResponse(true, "Operation successful", data);
+    }
+
+    public static ApiResponse success() {
+        return new ApiResponse(true, "Operation successful");
+    }
+
+    public static ApiResponse error(String message) {
+        return new ApiResponse(false, message);
+    }
+
     public boolean isSuccess() {
         return success;
     }
