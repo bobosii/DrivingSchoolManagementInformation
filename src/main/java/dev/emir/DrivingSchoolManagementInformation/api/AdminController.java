@@ -59,9 +59,9 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/course/create")
-    public ResponseEntity<ApiResponse<Course>> createCourse(@RequestBody CreateCourseRequest request) {
-        Course created = courseService.createCourse(request.getName(), request.getCourseType());
-        ApiResponse<Course> response = new ApiResponse<>(true, "Course created successfully", created);
+    public ResponseEntity<ApiResponse<CourseResponse>> createCourse(@RequestBody CreateCourseRequest request) {
+        CourseResponse created = courseService.createCourse(request.getName(), request.getCourseType());
+        ApiResponse<CourseResponse> response = new ApiResponse<>(true, "Course created successfully", created);
         return ResponseEntity.ok(response);
     }
 

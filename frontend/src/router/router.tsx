@@ -16,6 +16,8 @@ import DocumentsPage from "../pages/DocumentsPage";
 import TermsPage from "../pages/TermsPage";
 import ClassroomsPage from '../pages/ClassroomsPage';
 import ExamsPage from '../pages/ExamsPage';
+import CoursesPage from '../pages/CoursesPage';
+import CourseSessionsPage from '../pages/CourseSessionsPage';
 
 export const router = createBrowserRouter([
   {
@@ -164,7 +166,23 @@ export const router = createBrowserRouter([
             <ClassroomsPage />
           </ProtectedRoute>
         )
-      }
+      },
+      {
+        path: "/courses",
+        element:( 
+        <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE"]} >
+             <CoursesPage />
+             </ProtectedRoute>
+        )
+      },
+      {
+        path: "/course-sessions",
+        element:( 
+        <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "STUDENT"]} >
+             <CourseSessionsPage />
+             </ProtectedRoute>
+        )
+      },
     ],
   },
 ]);

@@ -53,9 +53,11 @@ public class ModelMappings {
                 created.getInstructor().getFirstName() + " " + created.getInstructor().getLastName(),
                 created.getClassroom().getName(),
                 created.getStartTime(),
-                created.getEndTime()
+                created.getEndTime(),
+                created.getMaxStudents(),
+                created.isActive()
         );
-        ApiResponse<CourseSessionResponse> response = new ApiResponse<>(true,"Course sesion created successfully",responseData);
+        ApiResponse<CourseSessionResponse> response = new ApiResponse<>(true,"Course session created successfully",responseData);
         return response;
     }
 

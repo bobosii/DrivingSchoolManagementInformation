@@ -32,7 +32,9 @@ public class CourseSession {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private int maxStudents;
+    @Column(name = "is_active")
     private boolean isActive;
+    private boolean isDeleted;
 
     @ManyToMany(mappedBy = "courseSessions")
     @JsonManagedReference
@@ -49,6 +51,7 @@ public class CourseSession {
         this.endTime = endTime;
         this.maxStudents = maxStudents;
         this.isActive = isActive;
+        this.isDeleted = false;
         this.students = students;
     }
 
@@ -122,5 +125,13 @@ public class CourseSession {
 
     public void setStudents(List<Student> students) {
         this.students = students;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }

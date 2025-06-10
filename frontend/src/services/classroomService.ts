@@ -5,6 +5,7 @@ export interface Classroom {
     name: string;
     capacity: number;
     location: string;
+    isActive: boolean;
 }
 
 export interface CreateClassroomRequest {
@@ -33,9 +34,9 @@ export const getClassroomById = async (id: number): Promise<Classroom> => {
     }
 };
 
-export const createClassroom = async (request: CreateClassroomRequest): Promise<Classroom> => {
+export const createClassroom = async (classroom: CreateClassroomRequest): Promise<Classroom> => {
     try {
-        const response = await axios.post('/classroom/create', request);
+        const response = await axios.post('/classroom/create', classroom);
         return response.data.data;
     } catch (error) {
         console.error('Error creating classroom:', error);
@@ -43,9 +44,9 @@ export const createClassroom = async (request: CreateClassroomRequest): Promise<
     }
 };
 
-export const updateClassroom = async (id: number, request: CreateClassroomRequest): Promise<Classroom> => {
+export const updateClassroom = async (id: number, classroom: CreateClassroomRequest): Promise<Classroom> => {
     try {
-        const response = await axios.put(`/classroom/${id}`, request);
+        const response = await axios.put(`/classroom/${id}`, classroom);
         return response.data.data;
     } catch (error) {
         console.error('Error updating classroom:', error);
@@ -56,8 +57,8 @@ export const updateClassroom = async (id: number, request: CreateClassroomReques
 export const deleteClassroom = async (id: number): Promise<void> => {
     try {
         await axios.delete(`/classroom/${id}`);
-    } catch (error: any) {
-        const errorMessage = error.response?.data?.message || 'Sınıf silinirken bir hata oluştu';
-        throw new Error(errorMessage);
+    } catch (error) {
+        console.error('Error deleting classroom:', error);
+        throw new Error('Sınıf silinirken bir hata oluştu');
     }
 }; 

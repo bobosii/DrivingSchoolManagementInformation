@@ -9,17 +9,21 @@ public class CourseSessionResponse {
     private String classroomName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private int maxStudents;
+    private boolean isActive;
 
     public CourseSessionResponse() {
     }
 
-    public CourseSessionResponse(Long id, String courseName, String instructorFullName, String classroomName, LocalDateTime startTime, LocalDateTime endTime) {
+    public CourseSessionResponse(Long id, String courseName, String instructorFullName, String classroomName, LocalDateTime startTime, LocalDateTime endTime, int maxStudents, boolean isActive) {
         this.id = id;
         this.courseName = courseName;
         this.instructorFullName = instructorFullName;
         this.classroomName = classroomName;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.maxStudents = maxStudents;
+        this.isActive = isActive;
     }
 
     public Long getId() {
@@ -68,5 +72,21 @@ public class CourseSessionResponse {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public int getMaxStudents() {
+        return maxStudents;
+    }
+
+    public void setMaxStudents(int maxStudents) {
+        this.maxStudents = maxStudents;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

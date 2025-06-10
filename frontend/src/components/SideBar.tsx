@@ -12,6 +12,8 @@ import {
     User,
     ClipboardList,
     Clock,
+    GraduationCap,
+    BookOpenCheck
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { FaUsers, FaCalendarAlt, FaCar, FaFileAlt, FaChalkboardTeacher, FaGraduationCap, FaBuilding } from 'react-icons/fa';
@@ -27,8 +29,8 @@ const menuItems: MenuItem[] = [
     {
         icon: Home,
         label: 'Dashboard',
-        path: '/dashboard',
-        roles: ['ADMIN', 'STUDENT', 'INSTRUCTOR', 'EMPLOYEE'],
+        path: '/admin',
+        roles: ['ADMIN'],
     },
     {
         icon: Calendar,
@@ -76,8 +78,20 @@ const menuItems: MenuItem[] = [
         icon: FaBuilding,
         label: 'Sınıflar',
         path: '/classrooms',
-        roles: ['ADMIN', 'EMPLOYEE', 'INSTRUCTOR', 'STUDENT']
+        roles: ['ADMIN', 'EMPLOYEE'],
     },
+    {
+        icon: GraduationCap,
+        label: 'Kurslar',
+        path: '/courses',
+        roles: ['ADMIN', 'EMPLOYEE'],
+    },
+    {
+        icon: BookOpenCheck,
+        label: 'Kurs Oturumları',
+        path: '/course-sessions',
+        roles: ['ADMIN', 'EMPLOYEE', 'STUDENT'],
+    }
 ];
 
 const Sidebar = () => {

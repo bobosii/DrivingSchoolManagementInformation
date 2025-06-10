@@ -1,11 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../api/axios";
 
 export default function LogoutButton() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        // Clear axios default headers
+        delete axiosInstance.defaults.headers.common['Authorization'];
+        
+        // Clear local storage
         localStorage.removeItem("token");
         localStorage.removeItem("linkedEntityId");
+        
+        // Navigate to login page
         navigate("/login");
     };
 
