@@ -1,4 +1,5 @@
 import axios from '../api/axios';
+import type { Student } from './studentService';
 
 export interface Course {
     id: number;
@@ -17,7 +18,8 @@ export interface CourseSession {
     startTime: string;
     endTime: string;
     maxStudents: number;
-    isActive: boolean;
+    active: boolean;
+    students?: Student[];
 }
 
 export interface CreateCourseSessionRequest {
@@ -102,5 +104,49 @@ const validateCourseSessionRequest = (request: CreateCourseSessionRequest) => {
     
     if (start >= end) {
         throw new Error('Bitiş zamanı başlangıç zamanından sonra olmalıdır');
+    }
+};
+
+export const assignStudentToSession = async (sessionId: number, studentId: number): Promise<CourseSession> => {
+    try {
+        const response = await axios.post(`/course-sessions/${sessionId}/students/${studentId}`);
+        if (!response.data.success) {
+            throw new Error(response.data.message || 'Öğrenci atanırken bir hata oluştu');
+        }
+        return response.data.data;
+    } catch (error: any) {
+        console.error('Error assigning student to session:', error);
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error('Öğrenci atanırken bir hata oluştu');
+    }
+};
+
+export const removeStudentFromSession = async (sessionId: number, studentId: number): Promise<CourseSession> => {
+    try {
+        const response = await axios.delete(`/course-sessions/${sessionId}/students/${studentId}`);
+        if (!response.data.success) {
+            throw new Error(response.data.message || 'Öğrenci kaldırılırken bir hata oluştu');
+        }
+        return response.data.data;
+    } catch (error: any) {
+        console.error('Error removing student from session:', error);
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error('Öğrenci kaldırılırken bir hata oluştu');
+    }
+};
+
+export const getUnassignedStudents = async (termId?: number): Promise<Student[]> => {
+    try {
+        const response = await axios.get('/course-sessions/unassigned-students', {
+            params: { termId }
+        });
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching unassigned students:', error);
+        throw new Error('Atanmamış öğrenciler alınırken bir hata oluştu');
     }
 }; 

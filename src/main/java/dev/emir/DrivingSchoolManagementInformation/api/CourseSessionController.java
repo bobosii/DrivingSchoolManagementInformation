@@ -4,6 +4,7 @@ import dev.emir.DrivingSchoolManagementInformation.dao.CourseSessionRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.course.CreateCourseSessionRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentResponse;
 import dev.emir.DrivingSchoolManagementInformation.service.CourseSessionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +92,48 @@ public class CourseSessionController {
     public ResponseEntity<ApiResponse<CourseSessionResponse>> deactivateCourseSession(@PathVariable Long id) {
         CourseSessionResponse session = courseSessionService.deactivateCourseSession(id);
         return ResponseEntity.ok(ApiResponse.success(session));
+    }
+
+    @PostMapping("/{sessionId}/students/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<ApiResponse<CourseSessionResponse>> assignStudentToSession(
+            @PathVariable Long sessionId,
+            @PathVariable Long studentId) {
+        try {
+            CourseSessionResponse response = courseSessionService.assignStudentToSession(sessionId, studentId);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenci kurs oturumuna başarıyla atandı", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Öğrenci atanırken bir hata oluştu", null));
+        }
+    }
+
+    @DeleteMapping("/{sessionId}/students/{studentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<ApiResponse<CourseSessionResponse>> removeStudentFromSession(
+            @PathVariable Long sessionId,
+            @PathVariable Long studentId) {
+        try {
+            CourseSessionResponse response = courseSessionService.removeStudentFromSession(sessionId, studentId);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenci kurs oturumundan başarıyla kaldırıldı", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, e.getMessage(), null));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false, "Öğrenci kaldırılırken bir hata oluştu", null));
+        }
+    }
+
+    @GetMapping("/unassigned-students")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    public ResponseEntity<ApiResponse<List<StudentResponse>>> getUnassignedStudents(
+            @RequestParam(required = false) Long termId) {
+        try {
+            List<StudentResponse> students = courseSessionService.getUnassignedStudents(termId);
+            return ResponseEntity.ok(ApiResponse.success(students));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 }
 

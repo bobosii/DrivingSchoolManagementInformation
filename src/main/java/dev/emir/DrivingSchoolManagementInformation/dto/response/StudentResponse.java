@@ -10,13 +10,13 @@ public class StudentResponse {
 
     public StudentResponse() {}
 
-    public StudentResponse(Long id, String firstName, String lastName, String email, String birthDate) {
+    public StudentResponse(Long id, String firstName, String lastName, String email, String birthDate, String fullName) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.birthDate = birthDate;
-        this.fullName = firstName + " " + lastName;
+        this.fullName = fullName;
     }
 
     public Long getId() {

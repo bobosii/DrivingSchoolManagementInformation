@@ -10,6 +10,7 @@ public class StudentDetailResponse {
     private String lastName;
     private String email;
     private LocalDateTime birthDate;
+    private Long termId;
     private String termName;
     private List<AppointmentInfo> appointments;
 
@@ -63,6 +64,14 @@ public class StudentDetailResponse {
 
     public void setBirthDate(LocalDateTime birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public Long getTermId() {
+        return termId;
+    }
+
+    public void setTermId(Long termId) {
+        this.termId = termId;
     }
 
     public String getTermName() {

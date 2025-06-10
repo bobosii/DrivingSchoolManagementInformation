@@ -64,6 +64,16 @@ export const deleteTerm = async (id: number): Promise<void> => {
     }
 };
 
+export const getUnassignedStudents = async (): Promise<StudentInTerm[]> => {
+    try {
+        const response = await axios.get('/term/unassigned-students');
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching unassigned students:', error);
+        throw error;
+    }
+};
+
 export const assignStudentToTerm = async (termId: number, studentId: number): Promise<Term> => {
     try {
         const response = await axios.post(`/term/${termId}/students/${studentId}`);

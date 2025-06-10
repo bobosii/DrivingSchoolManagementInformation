@@ -152,10 +152,6 @@ public class StudentController {
         Student student = studentRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("No student record found for user with ID " + id));
 
-        // Get student's term
-        Term term = termRepository.findByStudentsContaining(student)
-                .orElse(null);
-
         // Get student's appointments
         Optional<List<Appointment>> appointmentsOpt = appointmentRepository.findByStudentId(student.getId());
         List<Appointment> appointments = appointmentsOpt.orElse(List.of());
@@ -166,7 +162,7 @@ public class StudentController {
                 student.getLastName(),
                 student.getEmail(),
                 student.getBirthDate().atStartOfDay(),
-                term != null ? term.getName() : "No term assigned",
+                student.getTerm() != null ? student.getTerm().getName() : null,
                 appointments.stream()
                         .map(appointment -> new AppointmentInfo(
                                 appointment.getId(),
@@ -178,6 +174,11 @@ public class StudentController {
                         ))
                         .collect(Collectors.toList())
         );
+
+        // Set termId if term exists
+        if (student.getTerm() != null) {
+            response.setTermId(student.getTerm().getId());
+        }
 
         return ResponseEntity.ok(new ApiResponse<>(true, "Student details retrieved successfully", response));
     }

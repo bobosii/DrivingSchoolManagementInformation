@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getAllTerms, createTerm, updateTerm, deleteTerm, assignStudentToTerm, removeStudentFromTerm, getStudentsInTerm } from '../services/termService';
-import type { Term } from '../services/termService';
+import { getAllTerms, createTerm, updateTerm, deleteTerm, assignStudentToTerm, removeStudentFromTerm, getStudentsInTerm, getUnassignedStudents } from '../services/termService';
+import type { Term, StudentInTerm } from '../services/termService';
 import { getAllStudents } from '../services/studentService';
 import type { Student } from '../services/studentService';
 import { Plus, Edit, Trash2, Users } from 'lucide-react';
@@ -30,8 +30,9 @@ const TermsPage = () => {
     const [formData, setFormData] = useState({
         month: '',
         year: new Date().getFullYear(),
-        quota: 0
+        quota: 30
     });
+    const [unassignedStudents, setUnassignedStudents] = useState<StudentInTerm[]>([]);
 
     useEffect(() => {
         fetchData();
@@ -54,7 +55,7 @@ const TermsPage = () => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: name === 'quota' || name === 'year' ? parseInt(value) : value
+            [name]: name === 'year' || name === 'quota' ? parseInt(value) : value
         }));
     };
 
@@ -71,11 +72,12 @@ const TermsPage = () => {
             setFormData({
                 month: '',
                 year: new Date().getFullYear(),
-                quota: 0
+                quota: 30
             });
             fetchData();
         } catch (error) {
             console.error('Error saving term:', error);
+            alert('Dönem kaydedilirken bir hata oluştu');
         }
     };
 
@@ -103,7 +105,14 @@ const TermsPage = () => {
 
     const handleViewStudents = async (term: Term) => {
         setSelectedTerm(term);
-        setIsStudentModalOpen(true);
+        try {
+            const unassigned = await getUnassignedStudents();
+            setUnassignedStudents(unassigned);
+            setIsStudentModalOpen(true);
+        } catch (error) {
+            console.error('Error fetching unassigned students:', error);
+            alert('Atanmamış öğrenciler alınırken bir hata oluştu');
+        }
     };
 
     const handleAssignStudent = async (termId: number, studentId: number) => {
@@ -113,7 +122,8 @@ const TermsPage = () => {
             setSelectedTerm(prev => prev ? { ...prev, students: updatedStudents } : null);
             const updatedTerms = await getAllTerms();
             setTerms(updatedTerms);
-            setIsStudentModalOpen(false);
+            const unassigned = await getUnassignedStudents();
+            setUnassignedStudents(unassigned);
         } catch (error) {
             console.error('Error assigning student:', error);
             alert('Öğrenci atanırken bir hata oluştu');
@@ -127,9 +137,11 @@ const TermsPage = () => {
             setSelectedTerm(prev => prev ? { ...prev, students: updatedStudents } : null);
             const updatedTerms = await getAllTerms();
             setTerms(updatedTerms);
+            const unassigned = await getUnassignedStudents();
+            setUnassignedStudents(unassigned);
         } catch (error) {
             console.error('Error removing student:', error);
-            alert('Öğrenci kaldırılırken bir hata oluştu');
+            alert('Öğrenci çıkarılırken bir hata oluştu');
         }
     };
 
@@ -143,7 +155,7 @@ const TermsPage = () => {
                         setFormData({
                             month: '',
                             year: new Date().getFullYear(),
-                            quota: 0
+                            quota: 30
                         });
                         setIsModalOpen(true);
                     }}
@@ -159,41 +171,35 @@ const TermsPage = () => {
                     <thead className="bg-gray-50">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dönem</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kontenjan</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kota</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Öğrenci Sayısı</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {terms.map((term) => (
                             <tr key={term.id}>
+                                <td className="px-6 py-4 whitespace-nowrap">{term.name}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{term.quota}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{term.students?.length || 0}</td>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    {term.name}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {term.quota}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {term.students?.length || 0}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button
                                         onClick={() => handleViewStudents(term)}
-                                        className="text-green-600 hover:text-green-900 mr-4"
+                                        className="text-blue-600 hover:text-blue-900 mr-3"
                                     >
-                                        <Users size={20} />
+                                        <Users className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => handleEdit(term)}
-                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                        className="text-blue-600 hover:text-blue-900 mr-3"
                                     >
-                                        <Edit size={20} />
+                                        <Edit className="w-5 h-5" />
                                     </button>
                                     <button
                                         onClick={() => handleDelete(term.id)}
                                         className="text-red-600 hover:text-red-900"
                                     >
-                                        <Trash2 size={20} />
+                                        <Trash2 className="w-5 h-5" />
                                     </button>
                                 </td>
                             </tr>
@@ -204,69 +210,65 @@ const TermsPage = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-lg w-96">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <h2 className="text-xl font-bold mb-4">
-                            {editingTerm ? 'Dönem Düzenle' : 'Yeni Dönem'}
+                            {editingTerm ? 'Dönemi Düzenle' : 'Yeni Dönem Ekle'}
                         </h2>
                         <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Ay
-                                </label>
-                                <select
-                                    name="month"
-                                    value={formData.month}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                >
-                                    <option value="">Ay Seçin</option>
-                                    {MONTHS.map(month => (
-                                        <option key={month.value} value={month.value}>
-                                            {month.label}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Ay</label>
+                                    <select
+                                        name="month"
+                                        value={formData.month}
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    >
+                                        <option value="">Ay Seçin</option>
+                                        {MONTHS.map((month) => (
+                                            <option key={month.value} value={month.value}>
+                                                {month.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Yıl</label>
+                                    <input
+                                        type="number"
+                                        name="year"
+                                        value={formData.year}
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Kota</label>
+                                    <input
+                                        type="number"
+                                        name="quota"
+                                        value={formData.quota}
+                                        onChange={handleInputChange}
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        required
+                                    />
+                                </div>
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Yıl
-                                </label>
-                                <input
-                                    type="number"
-                                    name="year"
-                                    value={formData.year}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Kontenjan
-                                </label>
-                                <input
-                                    type="number"
-                                    name="quota"
-                                    value={formData.quota}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end gap-2">
+                            <div className="mt-6 flex justify-end space-x-3">
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                                 >
                                     İptal
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                                 >
-                                    {editingTerm ? 'Güncelle' : 'Oluştur'}
+                                    {editingTerm ? 'Güncelle' : 'Ekle'}
                                 </button>
                             </div>
                         </form>
@@ -276,7 +278,7 @@ const TermsPage = () => {
 
             {isStudentModalOpen && selectedTerm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded-lg w-[800px] max-h-[80vh] overflow-y-auto">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold">
                                 {selectedTerm.name} - Öğrenciler
@@ -288,7 +290,6 @@ const TermsPage = () => {
                                 ✕
                             </button>
                         </div>
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <h3 className="font-medium mb-2">Dönemdeki Öğrenciler</h3>
@@ -310,19 +311,17 @@ const TermsPage = () => {
                             <div>
                                 <h3 className="font-medium mb-2">Atanabilir Öğrenciler</h3>
                                 <div className="space-y-2">
-                                    {students
-                                        .filter(student => !selectedTerm.students?.some(s => s.id === student.id))
-                                        .map(student => (
-                                            <div key={student.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                                <span>{student.fullName}</span>
-                                                <button
-                                                    onClick={() => handleAssignStudent(selectedTerm.id, student.id)}
-                                                    className="text-green-600 hover:text-green-900"
-                                                >
-                                                    <Plus size={16} />
-                                                </button>
-                                            </div>
-                                        ))}
+                                    {unassignedStudents.map(student => (
+                                        <div key={student.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                            <span>{student.fullName}</span>
+                                            <button
+                                                onClick={() => handleAssignStudent(selectedTerm.id, student.id)}
+                                                className="text-green-600 hover:text-green-900"
+                                            >
+                                                <Plus size={16} />
+                                            </button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>

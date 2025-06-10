@@ -5,8 +5,8 @@ export interface StudentDetail {
     lastName: string;
     email: string;
     birthDate: string;
-    termId: number;
-    termName: string;
+    termId: number | null;
+    termName: string | null;
     appointments: {
         id: number;
         appointmentTime: string;

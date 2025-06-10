@@ -37,7 +37,7 @@ public class CourseSession {
     private boolean isDeleted;
 
     @ManyToMany(mappedBy = "courseSessions")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Student> students;
 
     public CourseSession() {}

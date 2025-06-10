@@ -1,6 +1,7 @@
 package dev.emir.DrivingSchoolManagementInformation.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class CourseSessionResponse {
     private Long id;
@@ -11,6 +12,7 @@ public class CourseSessionResponse {
     private LocalDateTime endTime;
     private int maxStudents;
     private boolean isActive;
+    private List<StudentResponse> students;
 
     public CourseSessionResponse() {
     }
@@ -88,5 +90,13 @@ public class CourseSessionResponse {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public List<StudentResponse> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<StudentResponse> students) {
+        this.students = students;
     }
 }

@@ -6,6 +6,7 @@ export interface Student {
     lastName: string;
     email: string;
     birthDate: string;
+    termId: number | null;
     termName: string | null;
     fullName: string;
 }
