@@ -149,4 +149,14 @@ export const getUnassignedStudents = async (termId?: number): Promise<Student[]>
         console.error('Error fetching unassigned students:', error);
         throw new Error('Atanmamış öğrenciler alınırken bir hata oluştu');
     }
+};
+
+export const getMyCourseSessions = async (): Promise<CourseSession[]> => {
+    try {
+        const response = await axios.get('/student/course-sessions');
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching my course sessions:', error);
+        throw error;
+    }
 }; 

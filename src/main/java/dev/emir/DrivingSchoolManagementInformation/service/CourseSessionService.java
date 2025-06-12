@@ -266,6 +266,13 @@ public class CourseSessionService {
                 .collect(Collectors.toList());
     }
 
+    public List<CourseSessionResponse> getSessionsForStudent(Long studentId) {
+        List<CourseSession> sessions = courseSessionRepository.findAllByStudents_Id(studentId);
+        return sessions.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
     private CourseSessionResponse convertToResponse(CourseSession session) {
         CourseSessionResponse response = new CourseSessionResponse(
                 session.getId(),

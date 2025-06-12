@@ -90,7 +90,13 @@ const menuItems: MenuItem[] = [
         icon: BookOpenCheck,
         label: 'Kurs Oturumları',
         path: '/course-sessions',
-        roles: ['ADMIN', 'EMPLOYEE', 'STUDENT'],
+        roles: ['ADMIN', 'EMPLOYEE'],
+    },
+    {
+        icon: BookOpenCheck,
+        label: 'Kurs Oturumlarım',
+        path: '/student/course-sessions',
+        roles: ['STUDENT'],
     }
 ];
 

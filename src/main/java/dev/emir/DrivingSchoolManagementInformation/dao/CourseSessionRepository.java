@@ -10,4 +10,5 @@ import java.util.List;
 public interface CourseSessionRepository extends JpaRepository<CourseSession, Long> {
     List<CourseSession> findByCourseId(Long courseId);
     List<CourseSession> findByIsDeletedFalse();
+    List<CourseSession> findAllByStudents_Id(Long studentId);
 }

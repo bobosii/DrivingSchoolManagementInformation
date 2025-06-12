@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**", "/api/student/register").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/theoretical/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                .requestMatchers("/api/student/course-sessions").hasAnyRole("STUDENT")
                 .requestMatchers("/api/term/**").hasAnyRole("ADMIN", "EMPLOYEE")
                 .requestMatchers("/api/appointments/all").hasAnyRole("ADMIN", "EMPLOYEE")
                 .requestMatchers("/api/appointments/student/**").hasAnyRole("ADMIN", "EMPLOYEE", "STUDENT")
