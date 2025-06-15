@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**", "/api/student/register").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN","EMPLOYEE")
                 .requestMatchers("/api/theoretical/**").hasAnyRole("ADMIN", "EMPLOYEE")
                 .requestMatchers("/api/student/course-sessions").hasAnyRole("STUDENT")
                 .requestMatchers("/api/term/**").hasAnyRole("ADMIN", "EMPLOYEE")

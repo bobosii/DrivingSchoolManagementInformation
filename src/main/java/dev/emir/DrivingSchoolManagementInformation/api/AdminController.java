@@ -66,7 +66,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
         try {
             List<User> users = userRepository.findAll();
@@ -100,7 +100,7 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole()('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
         try {
             if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -143,7 +143,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole()('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long id, @RequestBody CreateUserRequest request) {
         try {
             User user = userRepository.findById(id)
@@ -170,7 +170,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole()('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         try {
             userRepository.deleteById(id);

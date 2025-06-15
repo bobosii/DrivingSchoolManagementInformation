@@ -42,7 +42,7 @@ const menuItems: MenuItem[] = [
         icon: Users,
         label: 'Kullanıcılar',
         path: '/users',
-        roles: ['ADMIN'],
+        roles: ['ADMIN','EMPLOYEE'],
     },
     {
         icon: Car,
@@ -55,12 +55,6 @@ const menuItems: MenuItem[] = [
         label: 'Belgeler',
         path: '/documents',
         roles: ['ADMIN', 'EMPLOYEE'],
-    },
-    {
-        icon: BookOpen,
-        label: 'Dersler',
-        path: '/lessons',
-        roles: ['STUDENT', 'INSTRUCTOR'],
     },
     {
         icon: ClipboardList,
