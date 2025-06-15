@@ -1,6 +1,7 @@
 package dev.emir.DrivingSchoolManagementInformation.api;
 
 import dev.emir.DrivingSchoolManagementInformation.dto.request.DocumentCreateRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.request.DocumentUpdateRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.DocumentResponse;
 import dev.emir.DrivingSchoolManagementInformation.service.DocumentService;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,13 +49,13 @@ public class DocumentController {
             documentService.createDocument(request.getFile(), request.getType(), request.getStudentId())));
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<DocumentResponse>> updateDocument(
             @PathVariable Long id,
-            @Valid @ModelAttribute DocumentCreateRequest request) {
-        return ResponseEntity.ok(new ApiResponse<>(true, "Belge başarıyla güncellendi", 
-            documentService.updateDocument(id, request.getFile(), request.getType(), request.getStudentId())));
+            @Valid @RequestBody DocumentUpdateRequest request) {
+        DocumentResponse response = documentService.updateDocument(id, request);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Belge başarıyla güncellendi", response));
     }
 
     @DeleteMapping("/{id}")
@@ -67,5 +69,13 @@ public class DocumentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'STUDENT')")
     public ResponseEntity<byte[]> downloadDocument(@PathVariable Long id) {
         return documentService.downloadDocument(id);
+    }
+
+    @GetMapping("/my-documents")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<ApiResponse<List<DocumentResponse>>> getMyDocuments(Authentication authentication) {
+        Long studentId = Long.parseLong(authentication.getName());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenci belgeleri başarıyla getirildi", 
+            documentService.getDocumentsByStudentId(studentId)));
     }
 } 

@@ -19,6 +19,7 @@ import ExamsPage from '../pages/ExamsPage';
 import CoursesPage from '../pages/CoursesPage';
 import CourseSessionsPage from '../pages/CourseSessionsPage';
 import StudentCourseSessionsPage from '../pages/StudentCourseSessionsPage';
+import StudentDocumentsPage from '../pages/StudentDocumentsPage';
 
 export const router = createBrowserRouter([
   {
@@ -189,6 +190,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['STUDENT']}>
             <StudentCourseSessionsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/student/documents",
+        element: (
+          <ProtectedRoute allowedRoles={['STUDENT']}>
+            <StudentDocumentsPage />
           </ProtectedRoute>
         ),
       },

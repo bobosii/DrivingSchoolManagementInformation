@@ -2,17 +2,21 @@ import axios from '../api/axios';
 
 export interface Document {
     id: number;
-    type: string;
     fileName: string;
-    filePath: string;
     fileType: string;
-    fileSize: number;
+    uploadDate: string;
+    documentType: string;
     studentId: number;
     studentName: string;
 }
 
 export interface DocumentCreateRequest {
     file: File;
+    type: string;
+    studentId: number;
+}
+
+export interface DocumentUpdateRequest {
     type: string;
     studentId: number;
 }
@@ -66,18 +70,9 @@ export const createDocument = async (request: DocumentCreateRequest): Promise<Do
     }
 };
 
-export const updateDocument = async (id: number, request: DocumentCreateRequest): Promise<Document> => {
+export const updateDocument = async (id: number, request: DocumentUpdateRequest): Promise<Document> => {
     try {
-        const formData = new FormData();
-        formData.append('file', request.file);
-        formData.append('type', request.type);
-        formData.append('studentId', request.studentId.toString());
-
-        const response = await axios.put(`/documents/${id}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
+        const response = await axios.put(`/documents/${id}`, request);
         return response.data.data;
     } catch (error) {
         console.error('Error updating document:', error);
@@ -106,12 +101,12 @@ export const downloadDocument = async (id: number): Promise<void> => {
         // Get filename from Content-Disposition header
         const contentDisposition = response.headers['content-disposition'];
         let filename = 'document';
-        
+
         if (contentDisposition) {
             // Extract filename from Content-Disposition header
             const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
             const matches = filenameRegex.exec(contentDisposition);
-            
+
             if (matches != null && matches[1]) {
                 // Remove quotes and decode the filename
                 filename = decodeURIComponent(matches[1].replace(/['"]/g, ''));
@@ -132,4 +127,14 @@ export const downloadDocument = async (id: number): Promise<void> => {
         console.error('Error downloading document:', error);
         throw new Error('Belge indirilirken bir hata oluştu');
     }
-}; 
+};
+
+export const getMyDocuments = async (): Promise<Document[]> => {
+    try {
+        const response = await axios.get('/documents/my-documents');
+        return response.data.data;
+    } catch (error) {
+        console.error('Error fetching my documents:', error);
+        throw error;
+    }
+};

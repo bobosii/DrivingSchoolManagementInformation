@@ -97,7 +97,13 @@ const menuItems: MenuItem[] = [
         label: 'Kurs Oturumlarım',
         path: '/student/course-sessions',
         roles: ['STUDENT'],
-    }
+    },
+    {
+        icon: FileText,
+        label: 'Belgelerim',
+        path: '/student/documents',
+        roles: ['STUDENT'],
+    },
 ];
 
 const Sidebar = () => {

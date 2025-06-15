@@ -3,6 +3,7 @@ package dev.emir.DrivingSchoolManagementInformation.service;
 import dev.emir.DrivingSchoolManagementInformation.dao.DocumentRepository;
 import dev.emir.DrivingSchoolManagementInformation.dao.StudentRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.DocumentCreateRequest;
+import dev.emir.DrivingSchoolManagementInformation.dto.request.DocumentUpdateRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.DocumentResponse;
 import dev.emir.DrivingSchoolManagementInformation.models.Document;
 import dev.emir.DrivingSchoolManagementInformation.models.Student;
@@ -36,7 +37,11 @@ public class DocumentService {
     }
 
     public List<DocumentResponse> getDocumentsByStudentId(Long studentId) {
-        return documentRepository.findByStudentId(studentId).stream()
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException("Öğrenci bulunamadı"));
+        
+        return documentRepository.findByStudentId(studentId)
+                .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
@@ -69,28 +74,16 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentResponse updateDocument(Long id, MultipartFile file, String type, Long studentId) {
-        try {
-            Document document = documentRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Document not found"));
-            Student student = studentRepository.findById(studentId)
-                    .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+    public DocumentResponse updateDocument(Long id, DocumentUpdateRequest request) {
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Belge bulunamadı"));
 
-            document.setType(type);
-            document.setStudent(student);
+        document.setType(request.getType());
+        document.setStudent(studentRepository.findById(request.getStudentId())
+                .orElseThrow(() -> new EntityNotFoundException("Öğrenci bulunamadı")));
 
-            if (file != null && !file.isEmpty()) {
-                document.setFileName(file.getOriginalFilename());
-                document.setFileType(file.getContentType());
-                document.setFileSize(file.getSize());
-                document.setFileData(file.getBytes());
-            }
-
-            Document updatedDocument = documentRepository.save(document);
-            return convertToResponse(updatedDocument);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to store file", e);
-        }
+        Document updatedDocument = documentRepository.save(document);
+        return convertToResponse(updatedDocument);
     }
 
     @Transactional

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getAllDocuments, createDocument, updateDocument, deleteDocument, downloadDocument } from '../services/documentService';
-import type { Document } from '../services/documentService';
+import { getAllDocuments, createDocument, updateDocument, deleteDocument, downloadDocument, type Document, type DocumentCreateRequest, type DocumentUpdateRequest } from '../services/documentService';
 import { getAllStudents } from '../services/studentService';
 import type { Student } from '../services/studentService';
 import { Plus, Edit, Trash2, Download, FileText } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 interface StudentWithDocuments {
     student: Student;
@@ -75,21 +75,25 @@ const DocumentsPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.file) return;
+        if (!formData.file && !editingDocument) return;
 
         try {
             if (editingDocument) {
-                await updateDocument(editingDocument.id, {
-                    file: formData.file,
+                const updateRequest: DocumentUpdateRequest = {
                     type: formData.type,
-                    studentId: parseInt(formData.studentId)
-                });
+                    studentId: Number(formData.studentId)
+                };
+                await updateDocument(editingDocument.id, updateRequest);
+                toast.success('Belge başarıyla güncellendi');
             } else {
-                await createDocument({
-                    file: formData.file,
+                if (!formData.file) return;
+                const createRequest: DocumentCreateRequest = {
                     type: formData.type,
-                    studentId: parseInt(formData.studentId)
-                });
+                    studentId: Number(formData.studentId),
+                    file: formData.file
+                };
+                await createDocument(createRequest);
+                toast.success('Belge başarıyla oluşturuldu');
             }
             setIsModalOpen(false);
             setEditingDocument(null);
@@ -99,15 +103,15 @@ const DocumentsPage: React.FC = () => {
                 file: null
             });
             fetchData();
-        } catch (error) {
-            console.error('Error saving document:', error);
+        } catch (error: any) {
+            toast.error(error.message || 'Belge kaydedilirken bir hata oluştu');
         }
     };
 
     const handleEdit = (document: Document) => {
         setEditingDocument(document);
         setFormData({
-            type: document.type,
+            type: document.documentType,
             studentId: document.studentId.toString(),
             file: null
         });
@@ -177,8 +181,15 @@ const DocumentsPage: React.FC = () => {
                                         <div className="flex items-center space-x-3">
                                             <FileText className="w-5 h-5 text-blue-500" />
                                             <div>
-                                                <p className="font-medium text-gray-900">{document.type}</p>
-                                                <p className="text-sm text-gray-500">{document.fileName}</p>
+                                                <p className="font-medium text-gray-900">
+                                                    {document.fileName ? document.fileName : "Belge Adı Yok"}
+                                                </p>
+                                                {document.documentType && (
+                                                    <p className="text-xs text-gray-400">{document.documentType}</p>
+                                                )}
+                                                {document.uploadDate && !isNaN(new Date(document.uploadDate).getTime()) && (
+                                                    <p className="text-sm text-gray-500">{new Date(document.uploadDate).toLocaleDateString('tr-TR')}</p>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-2">
@@ -228,6 +239,7 @@ const DocumentsPage: React.FC = () => {
                                         onChange={handleInputChange}
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         required
+                                        disabled={!!editingDocument}
                                     >
                                         <option value="">Seçiniz</option>
                                         {students.map((student) => (
@@ -248,15 +260,17 @@ const DocumentsPage: React.FC = () => {
                                         required
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Dosya</label>
-                                    <input
-                                        type="file"
-                                        onChange={handleFileChange}
-                                        className="mt-1 block w-full"
-                                        required={!editingDocument}
-                                    />
-                                </div>
+                                {!editingDocument && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Dosya</label>
+                                        <input
+                                            type="file"
+                                            onChange={handleFileChange}
+                                            className="mt-1 block w-full"
+                                            required
+                                        />
+                                    </div>
+                                )}
                             </div>
                             <div className="mt-6 flex justify-end space-x-3">
                                 <button
