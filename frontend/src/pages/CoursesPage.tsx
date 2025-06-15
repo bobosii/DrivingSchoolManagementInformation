@@ -4,6 +4,7 @@ import type { Course, CreateCourseRequest } from '../services/courseService';
 import { useAuth } from '../context/AuthContext';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useSearch } from '../context/SearchContext';
 
 const CoursesPage: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
@@ -16,6 +17,7 @@ const CoursesPage: React.FC = () => {
     const [errors, setErrors] = useState<Partial<CreateCourseRequest>>({});
     const [isLoading, setIsLoading] = useState(false);
     const { userRole } = useAuth();
+    const { searchTerm } = useSearch();
 
     useEffect(() => {
         fetchCourses();
@@ -110,6 +112,13 @@ const CoursesPage: React.FC = () => {
 
     const canEdit = userRole === 'ADMIN' || userRole === 'EMPLOYEE';
 
+    // Kursları filtrele
+    const filteredCourses = courses.filter(course =>
+        !searchTerm ||
+        course.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.courseType?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -148,7 +157,7 @@ const CoursesPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {courses.map((course) => (
+                            {filteredCourses.map((course) => (
                                 <tr key={course.id}>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.name}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{course.courseType}</td>

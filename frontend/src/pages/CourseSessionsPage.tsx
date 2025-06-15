@@ -15,6 +15,7 @@ import { Plus, Edit, Trash2, CheckCircle, XCircle, Users, Search } from 'lucide-
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
+import { useSearch } from '../context/SearchContext';
 
 const CourseSessionsPage = () => {
     const [sessions, setSessions] = useState<CourseSession[]>([]);
@@ -40,6 +41,7 @@ const CourseSessionsPage = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [isLoading, setIsLoading] = useState(false);
     const [unassignedStudents, setUnassignedStudents] = useState<Student[]>([]);
+    const { searchTerm: globalSearchTerm } = useSearch();
 
     useEffect(() => {
         fetchData();
@@ -271,12 +273,12 @@ const CourseSessionsPage = () => {
         }
     };
 
-    const filteredStudents = students.filter(student => {
-        const matchesSearch = student.fullName.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesTerm = !selectedTerm || student.termName === terms.find(t => t.id === selectedTerm)?.name;
-        const isNotAssigned = !selectedSession?.students?.some(s => s.id === student.id);
-        return matchesSearch && matchesTerm && isNotAssigned;
-    });
+    const filteredSessions = sessions.filter(session =>
+        !globalSearchTerm ||
+        session.courseName?.toLowerCase().includes(globalSearchTerm.toLowerCase()) ||
+        session.instructorFullName?.toLowerCase().includes(globalSearchTerm.toLowerCase()) ||
+        session.classroomName?.toLowerCase().includes(globalSearchTerm.toLowerCase())
+    );
 
     return (
         <div className="p-6">
@@ -323,7 +325,7 @@ const CourseSessionsPage = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sessions.map((session) => (
+                            {filteredSessions.map((session) => (
                                 <tr key={session.id}>
                                     <td className="px-6 py-4 whitespace-nowrap">{session.courseName}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">{session.instructorFullName}</td>
@@ -590,21 +592,21 @@ const CourseSessionsPage = () => {
                                     </select>
                                 </div>
                                 <div className="bg-gray-50 rounded-lg p-4 h-[400px] overflow-y-auto">
-                                    {filteredStudents.length === 0 ? (
+                                    {filteredSessions.length === 0 ? (
                                         <p className="text-gray-500 text-center">Atanabilecek öğrenci bulunamadı</p>
                                     ) : (
                                         <div className="space-y-2">
-                                            {filteredStudents.map((student) => (
+                                            {filteredSessions.map((session) => (
                                                 <div
-                                                    key={student.id}
+                                                    key={session.id}
                                                     className="flex items-center justify-between bg-white p-3 rounded shadow-sm"
                                                 >
                                                     <div>
-                                                        <p className="font-medium">{student.fullName}</p>
-                                                        <p className="text-sm text-gray-500">{student.email}</p>
+                                                        <p className="font-medium">{session.courseName}</p>
+                                                        <p className="text-sm text-gray-500">{session.instructorFullName}</p>
                                                     </div>
                                                     <button
-                                                        onClick={() => handleAssignStudent(selectedSession.id, student.id)}
+                                                        onClick={() => handleAssignStudent(session.id, session.instructorId)}
                                                         className="text-green-600 hover:text-green-900"
                                                     >
                                                         <Plus size={20} />

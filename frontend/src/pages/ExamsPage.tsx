@@ -3,6 +3,7 @@ import { getAllExams, createExam, updateExam, deleteExam, downloadExam } from '.
 import type { Exam, CreateExamRequest } from '../services/examService';
 import { useAuth } from '../context/AuthContext';
 import { Plus, Edit, Trash2, Download } from 'lucide-react';
+import { useSearch } from '../context/SearchContext';
 
 const ExamsPage: React.FC = () => {
     const [exams, setExams] = useState<Exam[]>([]);
@@ -15,6 +16,7 @@ const ExamsPage: React.FC = () => {
         file: null as unknown as File
     });
     const { userRole } = useAuth();
+    const { searchTerm } = useSearch();
 
     useEffect(() => {
         fetchExams();
@@ -100,6 +102,14 @@ const ExamsPage: React.FC = () => {
 
     const canEdit = userRole === 'ADMIN' || userRole === 'EMPLOYEE' || userRole === 'INSTRUCTOR';
 
+    // Sınavları filtrele
+    const filteredExams = exams.filter(exam =>
+        !searchTerm ||
+        exam.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        exam.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        new Date(exam.examDate).toLocaleDateString('tr-TR').includes(searchTerm)
+    );
+
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -138,7 +148,7 @@ const ExamsPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {exams.map((exam) => (
+                        {filteredExams.map((exam) => (
                             <tr key={exam.id}>
                                 <td className="px-6 py-4 whitespace-nowrap">{exam.title}</td>
                                 <td className="px-6 py-4">{exam.description}</td>

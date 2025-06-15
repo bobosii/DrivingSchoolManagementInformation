@@ -9,6 +9,7 @@ import { getAllAppointmentTypes, type AppointmentType } from "../../services/app
 import { getAllStudents, type Student } from "../../services/studentService";
 import { getAllCourseSessions, type CourseSession } from "../../services/courseSessionService";
 import { Form, Select } from "antd";
+import { useSearch } from '../../context/SearchContext';
 
 const AppointmentsPage = () => {
     const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
@@ -30,6 +31,7 @@ const AppointmentsPage = () => {
         appointmentTime: '',
         status: 'PENDING'
     });
+    const { searchTerm } = useSearch();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -229,9 +231,15 @@ const AppointmentsPage = () => {
         await fetchAppointments();
     };
 
-    const filteredAppointments = selectedStatus === "ALL" 
-        ? appointments 
-        : appointments.filter(appt => appt.status === selectedStatus);
+    const filteredAppointments = appointments
+        .filter(appt => selectedStatus === "ALL" || appt.status === selectedStatus)
+        .filter(appt =>
+            !searchTerm ||
+            appt.studentName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            appt.instructorName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            appt.appointmentTypeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            String(appt.id).includes(searchTerm)
+        );
 
     return (
         <div className="p-6">

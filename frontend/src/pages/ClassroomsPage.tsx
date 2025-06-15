@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import type { Classroom, CreateClassroomRequest } from '../services/classroomService';
 import { createClassroom, deleteClassroom, getAllClassrooms, updateClassroom } from '../services/classroomService';
 import { Plus, Edit, Trash2, Users, MapPin } from 'lucide-react';
+import { useSearch } from '../context/SearchContext';
 
 const ClassroomsPage: React.FC = () => {
     const { userRole } = useAuth();
@@ -15,6 +16,7 @@ const ClassroomsPage: React.FC = () => {
         capacity: 0,
         location: ''
     });
+    const { searchTerm } = useSearch();
 
     const isAdminOrEmployee = userRole === 'ADMIN' || userRole === 'EMPLOYEE';
 
@@ -90,6 +92,14 @@ const ClassroomsPage: React.FC = () => {
         setFormData({ name: '', capacity: 0, location: '' });
     };
 
+    // Sınıfları filtrele
+    const filteredClassrooms = classrooms.filter(classroom =>
+        !searchTerm ||
+        classroom.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        classroom.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        String(classroom.capacity).includes(searchTerm)
+    );
+
     if (loading) {
         return (
             <div className="p-6">
@@ -116,7 +126,7 @@ const ClassroomsPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {classrooms.map((classroom) => (
+                {filteredClassrooms.map((classroom) => (
                     <div key={classroom.id} className="bg-white rounded-xl shadow-md p-6 border border-gray-100 hover:shadow-lg transition-shadow">
                         <h2 className="text-xl font-semibold text-gray-800 mb-4">{classroom.name}</h2>
                         <div className="space-y-3">

@@ -4,6 +4,7 @@ import { getAllStudents } from '../services/studentService';
 import type { Student } from '../services/studentService';
 import { Plus, Edit, Trash2, Download, FileText } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useSearch } from '../context/SearchContext';
 
 interface StudentWithDocuments {
     student: Student;
@@ -20,6 +21,7 @@ const DocumentsPage: React.FC = () => {
         studentId: '',
         file: null as File | null
     });
+    const { searchTerm } = useSearch();
 
     useEffect(() => {
         fetchData();
@@ -147,6 +149,17 @@ const DocumentsPage: React.FC = () => {
         });
     };
 
+    // Belgeleri filtrele
+    const filteredStudentDocuments = studentDocuments.map(({ student, documents }) => ({
+        student,
+        documents: documents.filter(document =>
+            !searchTerm ||
+            document.fileName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            document.documentType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    })).filter(group => group.documents.length > 0);
+
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
@@ -169,7 +182,7 @@ const DocumentsPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {studentDocuments.map(({ student, documents }) => (
+                {filteredStudentDocuments.map(({ student, documents }) => (
                     <div key={student.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
                         <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
                             <h2 className="text-xl font-semibold text-white">{student.fullName}</h2>
