@@ -9,6 +9,8 @@ public class CreateUserRequest {
     private String lastName;
     private String email;
     private String birthDate;
+    private String department;
+    private String certificationNo;
 
     public String getUsername() {
         return username;
@@ -72,5 +74,21 @@ public class CreateUserRequest {
 
     public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getCertificationNo() {
+        return certificationNo;
+    }
+
+    public void setCertificationNo(String certificationNo) {
+        this.certificationNo = certificationNo;
     }
 } 

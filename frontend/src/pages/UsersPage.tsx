@@ -20,7 +20,7 @@ export default function UsersPage() {
     const [studentDetail, setStudentDetail] = useState<StudentDetail | null>(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [addForm, setAddForm] = useState({ username: "", password: "", fullName: "", role: "STUDENT", firstName: "", lastName: "", email: "", birthDate: "" });
+    const [addForm, setAddForm] = useState({ username: "", password: "", fullName: "", role: "STUDENT", firstName: "", lastName: "", email: "", birthDate: "", department: "", certificationNo: "" });
     const [addLoading, setAddLoading] = useState(false);
     const [addError, setAddError] = useState<string | null>(null);
     const [addSuccess, setAddSuccess] = useState<string | null>(null);
@@ -124,7 +124,7 @@ export default function UsersPage() {
             );
             setAddSuccess("User created successfully.");
             setIsAddModalOpen(false);
-            setAddForm({ username: "", password: "", fullName: "", role: "STUDENT", firstName: "", lastName: "", email: "", birthDate: "" });
+            setAddForm({ username: "", password: "", fullName: "", role: "STUDENT", firstName: "", lastName: "", email: "", birthDate: "", department: "", certificationNo: "" });
             // Refresh user list
             const data = await getAllUsers();
             setUsers(data);
@@ -145,7 +145,9 @@ export default function UsersPage() {
             lastName: user.lastName || "",
             email: user.email || "",
             birthDate: user.birthDate || "",
-            role: user.role
+            role: user.role,
+            department: user.department || "",
+            certificationNo: user.certificationNo || ""
         });
         setIsEditModalOpen(true);
         setEditError(null);
@@ -554,6 +556,32 @@ export default function UsersPage() {
                                     <option value="STUDENT">Student</option>
                                 </select>
                             </div>
+                            {addForm.role === "EMPLOYEE" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Departman</label>
+                                    <input
+                                        type="text"
+                                        name="department"
+                                        value={addForm.department}
+                                        onChange={handleAddInputChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        required
+                                    />
+                                </div>
+                            )}
+                            {addForm.role === "INSTRUCTOR" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Sertifika No</label>
+                                    <input
+                                        type="text"
+                                        name="certificationNo"
+                                        value={addForm.certificationNo}
+                                        onChange={handleAddInputChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        required
+                                    />
+                                </div>
+                            )}
                             {addError && <div className="text-red-600 text-sm">{addError}</div>}
                             <button
                                 type="submit"
@@ -662,6 +690,32 @@ export default function UsersPage() {
                                     <option value="STUDENT">Student</option>
                                 </select>
                             </div>
+                            {editForm.role === "EMPLOYEE" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Departman</label>
+                                    <input
+                                        type="text"
+                                        name="department"
+                                        value={editForm.department}
+                                        onChange={handleEditInputChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        required
+                                    />
+                                </div>
+                            )}
+                            {editForm.role === "INSTRUCTOR" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Sertifika No</label>
+                                    <input
+                                        type="text"
+                                        name="certificationNo"
+                                        value={editForm.certificationNo}
+                                        onChange={handleEditInputChange}
+                                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                                        required
+                                    />
+                                </div>
+                            )}
                             {editError && <div className="text-red-600 text-sm">{editError}</div>}
                             <button
                                 type="submit"

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { getMyCourseSessions } from '../services/courseSessionService';
 import type { CourseSession } from '../services/courseSessionService';
+import { useSearch } from '../context/SearchContext';
 
 const StudentCourseSessionsPage = () => {
     const [sessions, setSessions] = useState<CourseSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { searchTerm } = useSearch();
 
     useEffect(() => {
         fetchSessions();
@@ -34,6 +36,20 @@ const StudentCourseSessionsPage = () => {
             minute: '2-digit'
         });
     };
+
+    // Filtreleme fonksiyonu
+    const filteredSessions = sessions.filter(session => {
+        if (!searchTerm) return true;
+
+        const searchLower = searchTerm.toLowerCase();
+        return (
+            session.courseName?.toLowerCase().includes(searchLower) ||
+            session.instructorFullName?.toLowerCase().includes(searchLower) ||
+            session.classroomName?.toLowerCase().includes(searchLower) ||
+            formatDateTime(session.startTime).toLowerCase().includes(searchLower) ||
+            formatDateTime(session.endTime).toLowerCase().includes(searchLower)
+        );
+    });
 
     if (loading) {
         return (
@@ -77,7 +93,7 @@ const StudentCourseSessionsPage = () => {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {sessions.map((session) => (
+                        {filteredSessions.map((session) => (
                             <tr key={session.id} className="hover:bg-gray-50">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     {session.courseName}

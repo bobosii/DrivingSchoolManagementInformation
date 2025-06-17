@@ -148,7 +148,7 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         element: (
-          <ProtectedRoute allowedRoles={["ADMIN", "EMPLOYEE", "INSTRUCTOR", "STUDENT"]}>
+          <ProtectedRoute allowedRoles={["INSTRUCTOR", "STUDENT"]}>
             <div>Profile Page</div>
           </ProtectedRoute>
         ),

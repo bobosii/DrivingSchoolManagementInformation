@@ -11,6 +11,8 @@ export interface User {
     termId?: number;
     fullName: string;
     termName?: string;
+    department?: string;
+    certificationNo?: string;
 }
 
 export const getAllUsers = async (): Promise<User[]> => {
@@ -36,4 +38,15 @@ export const searchUsers = (users: User[], searchTerm: string): User[] => {
                fullName.includes(lowerSearchTerm) || 
                termName.includes(lowerSearchTerm);
     });
+};
+
+export const getAllEmployees = async (): Promise<User[]> => {
+    try {
+        const response = await axios.get('admin/users');
+        // Sadece EMPLOYEE rolündekileri döndür
+        return response.data.data.filter((user: any) => user.role === 'EMPLOYEE');
+    } catch (error) {
+        console.error('Error fetching employees:', error);
+        throw new Error('Çalışanlar alınırken bir hata oluştu');
+    }
 }; 

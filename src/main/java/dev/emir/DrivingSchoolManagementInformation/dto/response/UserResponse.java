@@ -11,6 +11,8 @@ public class UserResponse {
     private String birthDate;
     private Long termId;
     private String termName;
+    private String department;
+    private String certificationNo;
 
     public UserResponse() {}
 
@@ -104,5 +106,21 @@ public class UserResponse {
 
     public void setTermName(String termName) {
         this.termName = termName;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getCertificationNo() {
+        return certificationNo;
+    }
+
+    public void setCertificationNo(String certificationNo) {
+        this.certificationNo = certificationNo;
     }
 }

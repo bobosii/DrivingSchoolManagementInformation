@@ -76,7 +76,6 @@ public class AdminController {
                         response.setId(user.getId());
                         response.setUsername(user.getUsername());
                         response.setRole(user.getRole().name());
-                        
                         if (user.getStudent() != null) {
                             response.setFirstName(user.getStudent().getFirstName());
                             response.setLastName(user.getStudent().getLastName());
@@ -87,8 +86,19 @@ public class AdminController {
                                 response.setTermId(user.getStudent().getTerm().getId());
                                 response.setTermName(user.getStudent().getTerm().getName());
                             }
+                        } else if (user.getEmployee() != null) {
+                            response.setFirstName(user.getEmployee().getFirstName());
+                            response.setLastName(user.getEmployee().getLastName());
+                            response.setEmail(user.getEmployee().getEmail());
+                            response.setFullName(user.getEmployee().getFullName());
+                            response.setDepartment(user.getEmployee().getDepartment());
+                        } else if (user.getInstructor() != null) {
+                            response.setFirstName(user.getInstructor().getFirstName());
+                            response.setLastName(user.getInstructor().getLastName());
+                            response.setEmail(user.getInstructor().getEmail());
+                            response.setFullName(user.getInstructor().getFullName());
+                            response.setCertificationNo(user.getInstructor().getCertificationNo());
                         }
-                        
                         return response;
                     })
                     .collect(Collectors.toList());
@@ -100,7 +110,7 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    @PreAuthorize("hasAnyRole()('ADMIN','EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
         try {
             if (userRepository.findByUsername(request.getUsername()).isPresent()) {
@@ -123,6 +133,28 @@ public class AdminController {
                 student.setUser(user);
                 user.setStudent(student);
             }
+            // If role is EMPLOYEE, create an Employee record
+            if (user.getRole() == Role.EMPLOYEE) {
+                Employee employee = new Employee();
+                employee.setFirstName(request.getFirstName());
+                employee.setLastName(request.getLastName());
+                employee.setEmail(request.getEmail());
+                employee.setBirthDate(LocalDate.parse(request.getBirthDate()));
+                employee.setDepartment(request.getDepartment());
+                employee.setUser(user);
+                user.setEmployee(employee);
+            }
+            // If role is INSTRUCTOR, create an Instructor record
+            if (user.getRole() == Role.INSTRUCTOR) {
+                Instructor instructor = new Instructor();
+                instructor.setFirstName(request.getFirstName());
+                instructor.setLastName(request.getLastName());
+                instructor.setEmail(request.getEmail());
+                instructor.setBirthDate(LocalDate.parse(request.getBirthDate()));
+                instructor.setCertificationNo(request.getCertificationNo());
+                instructor.setUser(user);
+                user.setInstructor(instructor);
+            }
 
             User savedUser = userRepository.save(user);
             UserResponse response = new UserResponse();
@@ -143,7 +175,7 @@ public class AdminController {
     }
 
     @PutMapping("/users/{id}")
-    @PreAuthorize("hasAnyRole()('ADMIN','EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(@PathVariable Long id, @RequestBody CreateUserRequest request) {
         try {
             User user = userRepository.findById(id)
@@ -154,6 +186,25 @@ public class AdminController {
                 user.setPassword(passwordEncoder.encode(request.getPassword()));
             }
             user.setRole(Role.valueOf(request.getRole()));
+
+            // Update Employee fields if role is EMPLOYEE
+            if (user.getRole() == Role.EMPLOYEE && user.getEmployee() != null) {
+                Employee employee = user.getEmployee();
+                employee.setFirstName(request.getFirstName());
+                employee.setLastName(request.getLastName());
+                employee.setEmail(request.getEmail());
+                employee.setBirthDate(LocalDate.parse(request.getBirthDate()));
+                employee.setDepartment(request.getDepartment());
+            }
+            // Update Instructor fields if role is INSTRUCTOR
+            if (user.getRole() == Role.INSTRUCTOR && user.getInstructor() != null) {
+                Instructor instructor = user.getInstructor();
+                instructor.setFirstName(request.getFirstName());
+                instructor.setLastName(request.getLastName());
+                instructor.setEmail(request.getEmail());
+                instructor.setBirthDate(LocalDate.parse(request.getBirthDate()));
+                instructor.setCertificationNo(request.getCertificationNo());
+            }
 
             User savedUser = userRepository.save(user);
 
@@ -170,7 +221,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasAnyRole()('ADMIN','EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
         try {
             userRepository.deleteById(id);
