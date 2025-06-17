@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface DocumentRepository extends JpaRepository<Document, Long> {
     List<Document> findByStudentId(Long studentId);
+    long countByStudent_Id(Long studentId);
 } 

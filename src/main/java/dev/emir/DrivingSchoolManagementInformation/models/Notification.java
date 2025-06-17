@@ -1,6 +1,7 @@
 package dev.emir.DrivingSchoolManagementInformation.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -11,8 +12,15 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Column(length = 1000)
     private String content;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime sentAt;
+
+    private boolean isRead = false;
+
     private boolean toAll;
 
     @ManyToOne
@@ -27,6 +35,14 @@ public class Notification {
         this.sentAt = sentAt;
         this.toAll = toAll;
         this.student = student;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 
     public Long getId() {

@@ -8,6 +8,7 @@ import dev.emir.DrivingSchoolManagementInformation.dto.request.student.StudentAp
 import dev.emir.DrivingSchoolManagementInformation.dto.request.student.StudentRegisterRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentDetailResponse;
+import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentDashboardResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.studentCourseSession.StudentCourseSessionResponse;
@@ -19,6 +20,7 @@ import dev.emir.DrivingSchoolManagementInformation.models.Term;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
 import dev.emir.DrivingSchoolManagementInformation.models.enums.Role;
 import dev.emir.DrivingSchoolManagementInformation.service.StudentCourseSessionService;
+import dev.emir.DrivingSchoolManagementInformation.service.StudentDashboardService;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.AppointmentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +45,7 @@ public class StudentController {
     private final TermRepository termRepository;
     private final StudentCourseSessionService studentCourseSessionService;
     private final AppointmentRepository appointmentRepository;
+    private final StudentDashboardService studentDashboardService;
 
     @Autowired
     public StudentController(
@@ -51,7 +54,8 @@ public class StudentController {
             PasswordEncoder passwordEncoder,
             TermRepository termRepository,
             StudentCourseSessionService studentCourseSessionService,
-            AppointmentRepository appointmentRepository
+            AppointmentRepository appointmentRepository,
+            StudentDashboardService studentDashboardService
     ) {
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
@@ -59,6 +63,7 @@ public class StudentController {
         this.termRepository = termRepository;
         this.studentCourseSessionService = studentCourseSessionService;
         this.appointmentRepository = appointmentRepository;
+        this.studentDashboardService = studentDashboardService;
     }
 
     @PostMapping("/register")
@@ -199,6 +204,14 @@ public class StudentController {
             ))
             .collect(Collectors.toList());
         return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenciler başarıyla getirildi", studentResponses));
+    }
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/dashboard")
+    public ResponseEntity<ApiResponse<StudentDashboardResponse>> getStudentDashboard(Authentication authentication) {
+        Long userId = ((Long) authentication.getPrincipal());
+        StudentDashboardResponse dto = studentDashboardService.getDashboardForUserId(userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Student dashboard data retrieved successfully", dto));
     }
 
     public boolean isCurrentUser(Long studentId) {

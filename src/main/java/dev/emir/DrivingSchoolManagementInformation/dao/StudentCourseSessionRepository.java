@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface StudentCourseSessionRepository extends JpaRepository<StudentCourseSession,Long> {
+public interface StudentCourseSessionRepository extends JpaRepository<StudentCourseSession, Long> {
     List<StudentCourseSession> findByStudentId(Long studentId);
+    long countByStudent_Id(Long studentId);
+
 }

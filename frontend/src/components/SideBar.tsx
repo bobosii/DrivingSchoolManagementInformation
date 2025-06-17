@@ -33,6 +33,12 @@ const menuItems: MenuItem[] = [
         roles: ['ADMIN'],
     },
     {
+        icon: Home,
+        label: 'Dashboard',
+        path: '/student',
+        roles: ['STUDENT'],
+    },
+    {
         icon: Calendar,
         label: 'Randevular',
         path: '/appointments',
@@ -102,7 +108,7 @@ const menuItems: MenuItem[] = [
         icon: User,
         label: 'Profil',
         path: '/profile',
-        roles: ['INSTRUCTOR', 'STUDENT'],
+        roles: ['INSTRUCTOR'],
     },
 ];
 
