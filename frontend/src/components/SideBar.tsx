@@ -99,6 +99,12 @@ const menuItems: MenuItem[] = [
         roles: ['STUDENT'],
     },
     {
+        icon: BookOpenCheck,
+        label: 'Kurs Oturumlarım',
+        path: '/instructor/sessions',
+        roles: ['INSTRUCTOR'],
+    },
+    {
         icon: FileText,
         label: 'Belgelerim',
         path: '/student/documents',

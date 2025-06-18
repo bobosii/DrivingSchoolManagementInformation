@@ -11,4 +11,5 @@ public interface CourseSessionRepository extends JpaRepository<CourseSession, Lo
     List<CourseSession> findByCourseId(Long courseId);
     List<CourseSession> findByIsDeletedFalse();
     List<CourseSession> findAllByStudents_Id(Long studentId);
+    List<CourseSession> findByInstructorIdAndIsDeletedFalse(Long instructorId);
 }

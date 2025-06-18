@@ -20,6 +20,7 @@ import CoursesPage from '../pages/CoursesPage';
 import CourseSessionsPage from '../pages/CourseSessionsPage';
 import StudentCourseSessionsPage from '../pages/StudentCourseSessionsPage';
 import StudentDocumentsPage from '../pages/StudentDocumentsPage';
+import InstructorSessionsPage from '../pages/InstructorSessionsPage';
 
 export const router = createBrowserRouter([
   {
@@ -198,6 +199,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['STUDENT']}>
             <StudentDocumentsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/instructor/sessions",
+        element: (
+          <ProtectedRoute allowedRoles={["INSTRUCTOR"]}>
+            <InstructorSessionsPage />
           </ProtectedRoute>
         ),
       },

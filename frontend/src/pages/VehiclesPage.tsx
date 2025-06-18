@@ -6,8 +6,10 @@ import type { VehicleType } from '../services/vehicleTypeService';
 import { getAllLicenseClasses } from '../services/licenseClassService';
 import type { LicenseClass } from '../services/licenseClassService';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
-const VehiclesPage = () => {
+const VehiclesPage: React.FC = () => {
+    const { isInstructor } = useAuth();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vehicleTypes, setVehicleTypes] = useState<VehicleType[]>([]);
     const [licenseClasses, setLicenseClasses] = useState<LicenseClass[]>([]);
@@ -50,21 +52,24 @@ const VehiclesPage = () => {
         }));
     };
 
+    const handleLicenseClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
+        setFormData(prev => ({
+            ...prev,
+            licenseClassIds: selectedOptions
+        }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const selectedVehicleType = vehicleTypes.find(type => type.id === parseInt(formData.vehicleTypeId));
-            if (!selectedVehicleType) {
-                throw new Error('Vehicle type not found');
-            }
-
             const vehicleData = {
                 plate: formData.plate,
                 brand: formData.brand,
                 automatic: formData.automatic,
                 inspectionDate: formData.inspectionDate,
                 insuranceDate: formData.insuranceDate,
-                vehicleTypeId: selectedVehicleType.id,
+                vehicleTypeId: parseInt(formData.vehicleTypeId),
                 licenseClassIds: formData.licenseClassIds
             };
 
@@ -73,6 +78,7 @@ const VehiclesPage = () => {
             } else {
                 await createVehicle(vehicleData);
             }
+
             setIsModalOpen(false);
             setEditingVehicle(null);
             setFormData({
@@ -115,80 +121,78 @@ const VehiclesPage = () => {
         }
     };
 
-    const handleLicenseClassChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedOptions = Array.from(e.target.selectedOptions, option => parseInt(option.value));
-        setFormData(prev => ({
-            ...prev,
-            licenseClassIds: selectedOptions
-        }));
-    };
-
     return (
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Araçlar</h1>
-                <button
-                    onClick={() => {
-                        setEditingVehicle(null);
-                        setFormData({
-                            plate: '',
-                            brand: '',
-                            automatic: false,
-                            inspectionDate: '',
-                            insuranceDate: '',
-                            vehicleTypeId: '',
-                            licenseClassIds: []
-                        });
-                        setIsModalOpen(true);
-                    }}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
-                >
-                    <Plus className="w-5 h-5 mr-2" />
-                    Yeni Araç Ekle
-                </button>
+                {!isInstructor && (
+                    <button
+                        onClick={() => {
+                            setEditingVehicle(null);
+                            setFormData({
+                                plate: '',
+                                brand: '',
+                                automatic: false,
+                                inspectionDate: '',
+                                insuranceDate: '',
+                                vehicleTypeId: '',
+                                licenseClassIds: []
+                            });
+                            setIsModalOpen(true);
+                        }}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
+                    >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Yeni Araç Ekle
+                    </button>
+                )}
             </div>
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plaka</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tip</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Otomatik</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Muayene Tarihi</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sigorta Tarihi</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
-                        </tr>
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plaka</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tip</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Otomatik</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Muayene Tarihi</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sigorta Tarihi</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                    </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {vehicles.map((vehicle) => (
-                            <tr key={vehicle.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">{vehicle.plate}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{vehicle.vehicleType.name}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{vehicle.automatic ? 'Evet' : 'Hayır'}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{new Date(vehicle.inspectionDate).toLocaleDateString()}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{new Date(vehicle.insuranceDate).toLocaleDateString()}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <button
-                                        onClick={() => handleEdit(vehicle)}
-                                        className="text-blue-600 hover:text-blue-900 mr-3"
-                                    >
-                                        <Edit className="w-5 h-5" />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(vehicle.id)}
-                                        className="text-red-600 hover:text-red-900"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                    {vehicles.map(vehicle => (
+                        <tr key={vehicle.id}>
+                            <td className="px-6 py-4 whitespace-nowrap">{vehicle.plate}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{vehicle.vehicleType.name}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{vehicle.automatic ? 'Evet' : 'Hayır'}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{new Date(vehicle.inspectionDate).toLocaleDateString()}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{new Date(vehicle.insuranceDate).toLocaleDateString()}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                                {!isInstructor && (
+                                    <>
+                                        <button
+                                            onClick={() => handleEdit(vehicle)}
+                                            className="text-blue-600 hover:text-blue-900 mr-3"
+                                        >
+                                            <Edit className="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(vehicle.id)}
+                                            className="text-red-600 hover:text-red-900"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </div>
 
-            {isModalOpen && (
+            {!isInstructor && isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md">
                         <h2 className="text-xl font-bold mb-4">
@@ -228,7 +232,7 @@ const VehiclesPage = () => {
                                         required
                                     >
                                         <option value="">Seçiniz</option>
-                                        {vehicleTypes.map((type) => (
+                                        {vehicleTypes.map(type => (
                                             <option key={type.id} value={type.id}>
                                                 {type.name}
                                             </option>
@@ -279,9 +283,9 @@ const VehiclesPage = () => {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         required
                                     >
-                                        {licenseClasses.map((licenseClass) => (
-                                            <option key={licenseClass.id} value={licenseClass.id}>
-                                                {licenseClass.code} - {licenseClass.description}
+                                        {licenseClasses.map(lc => (
+                                            <option key={lc.id} value={lc.id}>
+                                                {lc.code} - {lc.description}
                                             </option>
                                         ))}
                                     </select>
@@ -313,4 +317,4 @@ const VehiclesPage = () => {
     );
 };
 
-export default VehiclesPage; 
+export default VehiclesPage;

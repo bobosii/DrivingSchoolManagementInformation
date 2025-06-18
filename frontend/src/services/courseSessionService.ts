@@ -159,4 +159,9 @@ export const getMyCourseSessions = async (): Promise<CourseSession[]> => {
         console.error('Error fetching my course sessions:', error);
         throw error;
     }
+};
+
+export const getInstructorCourseSessions = async (): Promise<CourseSession[]> => {
+    const response = await axios.get('/course-sessions/my');
+    return response.data.data;
 }; 

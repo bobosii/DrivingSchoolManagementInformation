@@ -1,15 +1,20 @@
 package dev.emir.DrivingSchoolManagementInformation.api;
 
 import dev.emir.DrivingSchoolManagementInformation.dao.CourseSessionRepository;
+import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.course.CreateCourseSessionRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentResponse;
 import dev.emir.DrivingSchoolManagementInformation.service.CourseSessionService;
+import dev.emir.DrivingSchoolManagementInformation.models.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +25,13 @@ public class CourseSessionController {
 
     private final CourseSessionRepository courseSessionRepository;
     private final CourseSessionService courseSessionService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public CourseSessionController(CourseSessionRepository courseSessionRepository, CourseSessionService courseSessionService) {
+    public CourseSessionController(CourseSessionRepository courseSessionRepository, CourseSessionService courseSessionService, UserRepository userRepository) {
         this.courseSessionRepository = courseSessionRepository;
         this.courseSessionService = courseSessionService;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -32,6 +39,28 @@ public class CourseSessionController {
     public ResponseEntity<ApiResponse<List<CourseSessionResponse>>> getAllCourseSessions() {
         List<CourseSessionResponse> sessions = courseSessionService.getAllCourseSessions();
         return ResponseEntity.ok(ApiResponse.success(sessions));
+    }
+
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('INSTRUCTOR')")
+    public ResponseEntity<ApiResponse<List<CourseSessionResponse>>> getMySessions(
+            @AuthenticationPrincipal Long userId) {
+        try {
+            // User ID'den User'ı bul
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            
+            // Instructor ID'sini al
+            if (user.getInstructor() == null) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Instructor bilgisi bulunamadı"));
+            }
+            
+            Long instructorId = user.getInstructor().getId();
+            List<CourseSessionResponse> sessions = courseSessionService.getSessionsForInstructor(instructorId);
+            return ResponseEntity.ok(ApiResponse.success(sessions));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Kurs oturumları alınırken bir hata oluştu: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")

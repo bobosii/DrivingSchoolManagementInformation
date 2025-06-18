@@ -273,6 +273,14 @@ public class CourseSessionService {
                 .collect(Collectors.toList());
     }
 
+    public List<CourseSessionResponse> getSessionsForInstructor(Long instructorId) {
+        List<CourseSession> sessions = courseSessionRepository.findByInstructorIdAndIsDeletedFalse(instructorId);
+        updateSessionStatuses(sessions);
+        return sessions.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
     private CourseSessionResponse convertToResponse(CourseSession session) {
         CourseSessionResponse response = new CourseSessionResponse(
                 session.getId(),
