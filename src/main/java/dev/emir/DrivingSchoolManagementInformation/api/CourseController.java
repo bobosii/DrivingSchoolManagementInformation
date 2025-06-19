@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     private CourseService courseService;
 

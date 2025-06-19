@@ -6,7 +6,7 @@ import dev.emir.DrivingSchoolManagementInformation.models.Student;
 import dev.emir.DrivingSchoolManagementInformation.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+// Design Pattern: Service Layer Pattern
 @Service
 public class StudentDashboardService {
     @Autowired

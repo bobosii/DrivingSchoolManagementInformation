@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+// Design Pattern: Repository (DAO) Pattern
 @Repository
 public interface StudentCourseSessionRepository extends JpaRepository<StudentCourseSession, Long> {
     List<StudentCourseSession> findByStudentId(Long studentId);

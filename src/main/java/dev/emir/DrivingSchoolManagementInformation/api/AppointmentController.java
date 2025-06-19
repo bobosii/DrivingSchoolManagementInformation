@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/appointments")
 public class AppointmentController {
     private final AppointmentService appointmentService;
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     public AppointmentController(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;

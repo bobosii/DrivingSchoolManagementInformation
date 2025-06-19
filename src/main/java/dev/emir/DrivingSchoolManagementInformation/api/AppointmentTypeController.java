@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/appointment-types")
 public class AppointmentTypeController {
     private final AppointmentTypeRepository appointmentTypeRepository;
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     public AppointmentTypeController(AppointmentTypeRepository appointmentTypeRepository) {
         this.appointmentTypeRepository = appointmentTypeRepository;

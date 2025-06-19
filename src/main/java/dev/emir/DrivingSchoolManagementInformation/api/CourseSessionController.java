@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/course-sessions")
 public class CourseSessionController {
-
+    // Design Pattern: Service Layer Pattern
     private final CourseSessionService courseSessionService;
     private final CourseSessionControllerService courseSessionControllerService;
 

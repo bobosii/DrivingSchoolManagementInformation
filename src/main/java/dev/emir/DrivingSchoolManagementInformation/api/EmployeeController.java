@@ -24,7 +24,7 @@ public class EmployeeController {
     private final UserRepository userRepository;
     @Autowired
     private final EmployeeRepository employeeRepository;
-
+    // Design Pattern: Service Layer Pattern
     public EmployeeController(UserRepository userRepository, EmployeeRepository employeeRepository) {
         this.userRepository = userRepository;
         this.employeeRepository = employeeRepository;

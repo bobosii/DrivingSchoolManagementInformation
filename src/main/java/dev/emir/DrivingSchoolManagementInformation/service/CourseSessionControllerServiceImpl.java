@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+// Design Pattern: Service Layer Pattern
 @Service
 public class CourseSessionControllerServiceImpl implements CourseSessionControllerService {
 

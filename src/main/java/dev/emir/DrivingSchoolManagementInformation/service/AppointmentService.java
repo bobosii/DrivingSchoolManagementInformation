@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// Design Pattern: Service Layer Pattern
 @Service
 public class AppointmentService {
     private final StudentRepository studentRepository;

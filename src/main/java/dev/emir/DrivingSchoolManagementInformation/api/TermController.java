@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/term")
 public class TermController {
-
+    // Design Pattern: Service Layer Pattern
     private final TermService termService;
     private final StudentRepository studentRepository;
 

@@ -4,7 +4,7 @@ import dev.emir.DrivingSchoolManagementInformation.dto.response.instructor.Instr
 import dev.emir.DrivingSchoolManagementInformation.models.Instructor;
 
 import java.util.List;
-
+// Design Pattern: Service Layer Pattern
 public interface InstructorService {
     
     /**

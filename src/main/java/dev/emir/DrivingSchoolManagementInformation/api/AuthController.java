@@ -17,7 +17,7 @@ import java.util.Collections;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     private AuthenticationManager authenticationManager;
 

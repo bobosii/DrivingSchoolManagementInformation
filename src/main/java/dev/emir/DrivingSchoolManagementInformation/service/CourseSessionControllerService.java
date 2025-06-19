@@ -4,7 +4,7 @@ import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionRes
 import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentResponse;
 
 import java.util.List;
-
+// Design Pattern: Service Layer Pattern
 public interface CourseSessionControllerService {
     
     /**

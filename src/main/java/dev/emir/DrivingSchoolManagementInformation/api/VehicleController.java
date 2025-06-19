@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/vehicles")
 public class VehicleController {
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     private VehicleService vehicleService;
 

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TheoreticalLessonController {
     @Autowired
     private final StudentCourseSessionService service;
-
+    // Design Pattern: Service Layer Pattern
     public TheoreticalLessonController(StudentCourseSessionService service) {
         this.service = service;
     }

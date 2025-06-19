@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+// Design Pattern: Repository (DAO) Pattern
 @Repository
 public interface TermRepository extends JpaRepository<Term,Long> {
     Optional<Term> findByStudentsContaining(Student student);

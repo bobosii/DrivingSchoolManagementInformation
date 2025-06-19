@@ -9,7 +9,7 @@ import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentR
 import dev.emir.DrivingSchoolManagementInformation.dto.response.studentCourseSession.StudentCourseSessionResponse;
 
 import java.util.List;
-
+// Design Pattern: Service Layer Pattern
 public interface StudentService {
     
     /**

@@ -8,6 +8,7 @@ import dev.emir.DrivingSchoolManagementInformation.models.enums.CourseType;
 import java.util.List;
 import java.util.Map;
 
+// Design Pattern: Service Layer Pattern
 public interface AdminService {
     
     /**

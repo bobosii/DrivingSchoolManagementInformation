@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/vehicle-types")
 public class VehicleTypeController {
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     private VehicleTypeRepository vehicleTypeRepository;
 

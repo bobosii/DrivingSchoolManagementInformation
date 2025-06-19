@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-
+// Design Pattern: Service Layer Pattern
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 

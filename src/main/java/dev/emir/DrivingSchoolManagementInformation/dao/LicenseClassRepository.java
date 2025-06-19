@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+// Design Pattern: Repository (DAO) Pattern
 @Repository
 public interface LicenseClassRepository extends JpaRepository<LicenseClass, Long> {
     boolean existsByCode(String code);

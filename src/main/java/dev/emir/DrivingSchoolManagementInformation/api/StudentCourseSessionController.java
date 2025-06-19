@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/api/student")
 @PreAuthorize("hasRole('STUDENT')")
 public class StudentCourseSessionController {
-
+    // Design Pattern: Service Layer Pattern
     private final CourseSessionService courseSessionService;
 
     @Autowired

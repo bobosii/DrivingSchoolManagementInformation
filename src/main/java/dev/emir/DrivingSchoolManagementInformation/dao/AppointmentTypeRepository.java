@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+// Design Pattern: Repository (DAO) Pattern
 @Repository
 public interface AppointmentTypeRepository extends JpaRepository<AppointmentType,Long> {
     Optional<AppointmentType> findByName(String name);

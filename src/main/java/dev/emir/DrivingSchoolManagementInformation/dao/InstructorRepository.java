@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+// Design Pattern: Repository (DAO) Pattern
 @Repository
 public interface InstructorRepository extends JpaRepository<Instructor,Long> {
     Optional<Instructor> findByUserUsername(String username);

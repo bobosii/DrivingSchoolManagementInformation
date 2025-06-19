@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
+// Design Pattern: Repository (DAO) Pattern
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment,Long> {
     Optional<List<Appointment>> findByStudentId(Long studentId);

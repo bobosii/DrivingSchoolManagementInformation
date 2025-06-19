@@ -20,7 +20,7 @@ public class AdminController {
 
     @Autowired
     private final AdminService adminService;
-
+    // Design Pattern: Service Layer Pattern
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }

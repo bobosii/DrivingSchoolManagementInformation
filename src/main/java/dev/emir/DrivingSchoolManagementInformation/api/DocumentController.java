@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/documents")
 public class DocumentController {
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     private DocumentService documentService;
 

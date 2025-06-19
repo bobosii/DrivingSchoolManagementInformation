@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/student")
 public class StudentController {
-    
+    // Design Pattern: Service Layer Pattern
     private final StudentService studentService;
 
     @Autowired

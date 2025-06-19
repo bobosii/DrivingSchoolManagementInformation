@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/license-classes")
 public class LicenseClassController {
-
+    // Design Pattern: Service Layer Pattern
     @Autowired
     private LicenseClassService licenseClassService;
 
