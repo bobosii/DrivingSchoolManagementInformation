@@ -1,9 +1,5 @@
 package dev.emir.DrivingSchoolManagementInformation.api;
 
-import dev.emir.DrivingSchoolManagementInformation.dao.AppointmentRepository;
-import dev.emir.DrivingSchoolManagementInformation.dao.StudentRepository;
-import dev.emir.DrivingSchoolManagementInformation.dao.TermRepository;
-import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.student.StudentAppointmentRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.student.StudentRegisterRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
@@ -12,114 +8,49 @@ import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentDashboard
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentProfileResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.student.StudentRegisterResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.studentCourseSession.StudentCourseSessionResponse;
-import dev.emir.DrivingSchoolManagementInformation.helper.profileMapper.ModelMappings;
-import dev.emir.DrivingSchoolManagementInformation.models.Appointment;
-import dev.emir.DrivingSchoolManagementInformation.models.Student;
-import dev.emir.DrivingSchoolManagementInformation.models.StudentCourseSession;
-import dev.emir.DrivingSchoolManagementInformation.models.Term;
-import dev.emir.DrivingSchoolManagementInformation.models.User;
-import dev.emir.DrivingSchoolManagementInformation.models.enums.Role;
-import dev.emir.DrivingSchoolManagementInformation.service.StudentCourseSessionService;
-import dev.emir.DrivingSchoolManagementInformation.service.StudentDashboardService;
-import dev.emir.DrivingSchoolManagementInformation.dto.response.AppointmentInfo;
+import dev.emir.DrivingSchoolManagementInformation.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/student")
 public class StudentController {
-    private final StudentRepository studentRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final TermRepository termRepository;
-    private final StudentCourseSessionService studentCourseSessionService;
-    private final AppointmentRepository appointmentRepository;
-    private final StudentDashboardService studentDashboardService;
+    
+    private final StudentService studentService;
 
     @Autowired
-    public StudentController(
-            StudentRepository studentRepository,
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder,
-            TermRepository termRepository,
-            StudentCourseSessionService studentCourseSessionService,
-            AppointmentRepository appointmentRepository,
-            StudentDashboardService studentDashboardService
-    ) {
-        this.studentRepository = studentRepository;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.termRepository = termRepository;
-        this.studentCourseSessionService = studentCourseSessionService;
-        this.appointmentRepository = appointmentRepository;
-        this.studentDashboardService = studentDashboardService;
+    public StudentController(StudentService studentService) {
+        this.studentService = studentService;
     }
 
     @PostMapping("/register")
     @PreAuthorize("permitAll()")
     public ResponseEntity<ApiResponse<StudentRegisterResponse>> registerStudent(@RequestBody StudentRegisterRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().build();
+        try {
+            StudentRegisterResponse responseData = studentService.registerStudent(request);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Student registered successfully", responseData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Error registering student: " + e.getMessage(), null));
         }
-
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.STUDENT);
-
-        Term term = termRepository.findById(request.getTermId())
-                .orElseThrow(() -> new RuntimeException("Term not found"));
-
-        Student student = new Student();
-        student.setFirstName(request.getFirstName());
-        student.setLastName(request.getLastName());
-        student.setEmail(request.getEmail());
-        student.setBirthDate(request.getBirthDate());
-        student.setTerm(term);
-        student.setUser(user);
-
-        user.setStudent(student);
-        User savedUser = userRepository.save(user);
-
-        StudentRegisterResponse responseData = new StudentRegisterResponse(
-                student.getId(),
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                savedUser.getUsername(),
-                savedUser.getRole().name(),
-                term.getId()
-        );
-
-        ApiResponse<StudentRegisterResponse> response = new ApiResponse<>(true, "Student registered successfully", responseData);
-        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/profile")
     public ResponseEntity<ApiResponse<StudentProfileResponse>> getStudentProfile(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        Student student = studentRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
-        StudentProfileResponse profile = ModelMappings.toStudentProfile(student, user);
-        ApiResponse<StudentProfileResponse> response = new ApiResponse<>(true, "Profile information retrieved successfully", profile);
-
-        return ResponseEntity.ok(response);
+        try {
+            String username = authentication.getName();
+            StudentProfileResponse profile = studentService.getStudentProfile(username);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Profile information retrieved successfully", profile));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Error retrieving profile: " + e.getMessage(), null));
+        }
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -127,107 +58,59 @@ public class StudentController {
     public ResponseEntity<ApiResponse<StudentCourseSessionResponse>> createAppointment(
             @RequestBody StudentAppointmentRequest request
     ) {
-        StudentCourseSession result = studentCourseSessionService.createAppointment(
-                request.getStudentId(),
-                request.getCourseSessionId()
-        );
-
-        StudentCourseSessionResponse responseData = new StudentCourseSessionResponse(
-                result.getId(),
-                result.getStudent().getId(),
-                result.getCourseSession().getId(),
-                result.isApproved(),
-                result.getAssignedAt(),
-                null,
-                result.getCourseSession().getCourse().getName()
-        );
-
-        ApiResponse<StudentCourseSessionResponse> response = new ApiResponse<>(true, "Appointment created successfully", responseData);
-        return ResponseEntity.ok(response);
+        try {
+            StudentCourseSessionResponse responseData = studentService.createAppointment(request);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Appointment created successfully", responseData));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Error creating appointment: " + e.getMessage(), null));
+        }
     }
 
     @GetMapping("/{id}/details")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE') or (hasRole('STUDENT') and @studentController.isCurrentUser(#id))")
     public ResponseEntity<ApiResponse<StudentDetailResponse>> getStudentDetails(@PathVariable Long id) {
-        // First find the user
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User with ID " + id + " not found"));
-
-        // Then find the associated student
-        Student student = studentRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("No student record found for user with ID " + id));
-
-        // Get student's appointments
-        Optional<List<Appointment>> appointmentsOpt = appointmentRepository.findByStudentId(student.getId());
-        List<Appointment> appointments = appointmentsOpt.orElse(List.of());
-
-        StudentDetailResponse response = new StudentDetailResponse(
-                student.getId(),
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getBirthDate().atStartOfDay(),
-                student.getTerm() != null ? student.getTerm().getName() : null,
-                appointments.stream()
-                        .map(appointment -> new AppointmentInfo(
-                                appointment.getId(),
-                                appointment.getAppointmentTime(),
-                                appointment.getStatus().name(),
-                                appointment.getInstructor().getFirstName() + " " + appointment.getInstructor().getLastName(),
-                                "-",
-                                appointment.getAppointmentType() != null ? appointment.getAppointmentType().getName() : "-"
-                        ))
-                        .collect(Collectors.toList())
-        );
-
-        // Set termId if term exists
-        if (student.getTerm() != null) {
-            response.setTermId(student.getTerm().getId());
+        try {
+            StudentDetailResponse response = studentService.getStudentDetails(id);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Student details retrieved successfully", response));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Error retrieving student details: " + e.getMessage(), null));
         }
-
-        return ResponseEntity.ok(new ApiResponse<>(true, "Student details retrieved successfully", response));
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR') or hasRole('STUDENT')")
     public ResponseEntity<ApiResponse<List<StudentDetailResponse>>> getAllStudents() {
-        List<Student> students = studentRepository.findAll();
-        List<StudentDetailResponse> studentResponses = students.stream()
-            .map(student -> new StudentDetailResponse(
-                student.getId(),
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getBirthDate().atStartOfDay(),
-                student.getTerm() != null ? student.getTerm().getName() : null,
-                null
-            ))
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenciler başarıyla getirildi", studentResponses));
+        try {
+            List<StudentDetailResponse> studentResponses = studentService.getAllStudents();
+            return ResponseEntity.ok(new ApiResponse<>(true, "Öğrenciler başarıyla getirildi", studentResponses));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Error retrieving students: " + e.getMessage(), null));
+        }
     }
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/dashboard")
     public ResponseEntity<ApiResponse<StudentDashboardResponse>> getStudentDashboard(Authentication authentication) {
-        Long userId = ((Long) authentication.getPrincipal());
-        StudentDashboardResponse dto = studentDashboardService.getDashboardForUserId(userId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Student dashboard data retrieved successfully", dto));
+        try {
+            Long userId = ((Long) authentication.getPrincipal());
+            StudentDashboardResponse dto = studentService.getStudentDashboard(userId);
+            return ResponseEntity.ok(new ApiResponse<>(true, "Student dashboard data retrieved successfully", dto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse<>(false, "Error retrieving dashboard: " + e.getMessage(), null));
+        }
     }
 
     public boolean isCurrentUser(Long studentId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
 
         String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElse(null);
-
-        if (user == null || user.getStudent() == null) {
-            return false;
-        }
-
-        return user.getStudent().getId().equals(studentId);
+        return studentService.isCurrentUser(studentId, username);
     }
 }

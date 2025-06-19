@@ -110,12 +110,6 @@ const menuItems: MenuItem[] = [
         path: '/student/documents',
         roles: ['STUDENT'],
     },
-    {
-        icon: User,
-        label: 'Profil',
-        path: '/profile',
-        roles: ['INSTRUCTOR'],
-    },
 ];
 
 const Sidebar = () => {

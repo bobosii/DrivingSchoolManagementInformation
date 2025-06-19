@@ -1,20 +1,16 @@
 package dev.emir.DrivingSchoolManagementInformation.api;
 
-import dev.emir.DrivingSchoolManagementInformation.dao.CourseSessionRepository;
-import dev.emir.DrivingSchoolManagementInformation.dao.UserRepository;
 import dev.emir.DrivingSchoolManagementInformation.dto.request.course.CreateCourseSessionRequest;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.ApiResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.CourseSessionResponse;
 import dev.emir.DrivingSchoolManagementInformation.dto.response.StudentResponse;
+import dev.emir.DrivingSchoolManagementInformation.service.CourseSessionControllerService;
 import dev.emir.DrivingSchoolManagementInformation.service.CourseSessionService;
-import dev.emir.DrivingSchoolManagementInformation.models.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,22 +19,24 @@ import java.util.List;
 @RequestMapping("/api/course-sessions")
 public class CourseSessionController {
 
-    private final CourseSessionRepository courseSessionRepository;
     private final CourseSessionService courseSessionService;
-    private final UserRepository userRepository;
+    private final CourseSessionControllerService courseSessionControllerService;
 
     @Autowired
-    public CourseSessionController(CourseSessionRepository courseSessionRepository, CourseSessionService courseSessionService, UserRepository userRepository) {
-        this.courseSessionRepository = courseSessionRepository;
+    public CourseSessionController(CourseSessionService courseSessionService, CourseSessionControllerService courseSessionControllerService) {
         this.courseSessionService = courseSessionService;
-        this.userRepository = userRepository;
+        this.courseSessionControllerService = courseSessionControllerService;
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<List<CourseSessionResponse>>> getAllCourseSessions() {
-        List<CourseSessionResponse> sessions = courseSessionService.getAllCourseSessions();
-        return ResponseEntity.ok(ApiResponse.success(sessions));
+        try {
+            List<CourseSessionResponse> sessions = courseSessionService.getAllCourseSessions();
+            return ResponseEntity.ok(ApiResponse.success(sessions));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error retrieving course sessions: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/my")
@@ -46,17 +44,7 @@ public class CourseSessionController {
     public ResponseEntity<ApiResponse<List<CourseSessionResponse>>> getMySessions(
             @AuthenticationPrincipal Long userId) {
         try {
-            // User ID'den User'ı bul
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            
-            // Instructor ID'sini al
-            if (user.getInstructor() == null) {
-                return ResponseEntity.badRequest().body(ApiResponse.error("Instructor bilgisi bulunamadı"));
-            }
-            
-            Long instructorId = user.getInstructor().getId();
-            List<CourseSessionResponse> sessions = courseSessionService.getSessionsForInstructor(instructorId);
+            List<CourseSessionResponse> sessions = courseSessionControllerService.getMySessions(userId);
             return ResponseEntity.ok(ApiResponse.success(sessions));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Kurs oturumları alınırken bir hata oluştu: " + e.getMessage()));
@@ -66,23 +54,31 @@ public class CourseSessionController {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'INSTRUCTOR', 'STUDENT')")
     public ResponseEntity<ApiResponse<CourseSessionResponse>> getCourseSessionById(@PathVariable Long id) {
-        CourseSessionResponse session = courseSessionService.getCourseSessionById(id);
-        return ResponseEntity.ok(ApiResponse.success(session));
+        try {
+            CourseSessionResponse session = courseSessionService.getCourseSessionById(id);
+            return ResponseEntity.ok(ApiResponse.success(session));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error retrieving course session: " + e.getMessage()));
+        }
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<CourseSessionResponse>> createCourseSession(
             @Valid @RequestBody CreateCourseSessionRequest request) {
-        CourseSessionResponse session = courseSessionService.createCourseSession(
-                request.getCourseId(),
-                request.getStartTime(),
-                request.getEndTime(),
-                request.getInstructorId(),
-                request.getClassroomId(),
-                request.getMaxStudents()
-        );
-        return ResponseEntity.ok(ApiResponse.success(session));
+        try {
+            CourseSessionResponse session = courseSessionService.createCourseSession(
+                    request.getCourseId(),
+                    request.getStartTime(),
+                    request.getEndTime(),
+                    request.getInstructorId(),
+                    request.getClassroomId(),
+                    request.getMaxStudents()
+            );
+            return ResponseEntity.ok(ApiResponse.success(session));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error creating course session: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}")
@@ -90,37 +86,53 @@ public class CourseSessionController {
     public ResponseEntity<ApiResponse<CourseSessionResponse>> updateCourseSession(
             @PathVariable Long id,
             @Valid @RequestBody CreateCourseSessionRequest request) {
-        CourseSessionResponse session = courseSessionService.updateCourseSession(
-                id,
-                request.getCourseId(),
-                request.getStartTime(),
-                request.getEndTime(),
-                request.getInstructorId(),
-                request.getClassroomId(),
-                request.getMaxStudents()
-        );
-        return ResponseEntity.ok(ApiResponse.success(session));
+        try {
+            CourseSessionResponse session = courseSessionService.updateCourseSession(
+                    id,
+                    request.getCourseId(),
+                    request.getStartTime(),
+                    request.getEndTime(),
+                    request.getInstructorId(),
+                    request.getClassroomId(),
+                    request.getMaxStudents()
+            );
+            return ResponseEntity.ok(ApiResponse.success(session));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error updating course session: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<Void>> deleteCourseSession(@PathVariable Long id) {
-        courseSessionService.deleteCourseSession(id);
-        return ResponseEntity.ok(ApiResponse.success());
+        try {
+            courseSessionService.deleteCourseSession(id);
+            return ResponseEntity.ok(ApiResponse.success());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error deleting course session: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}/activate")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<CourseSessionResponse>> activateCourseSession(@PathVariable Long id) {
-        CourseSessionResponse session = courseSessionService.activateCourseSession(id);
-        return ResponseEntity.ok(ApiResponse.success(session));
+        try {
+            CourseSessionResponse session = courseSessionService.activateCourseSession(id);
+            return ResponseEntity.ok(ApiResponse.success(session));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error activating course session: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}/deactivate")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<ApiResponse<CourseSessionResponse>> deactivateCourseSession(@PathVariable Long id) {
-        CourseSessionResponse session = courseSessionService.deactivateCourseSession(id);
-        return ResponseEntity.ok(ApiResponse.success(session));
+        try {
+            CourseSessionResponse session = courseSessionService.deactivateCourseSession(id);
+            return ResponseEntity.ok(ApiResponse.success(session));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Error deactivating course session: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/{sessionId}/students/{studentId}")
@@ -158,7 +170,7 @@ public class CourseSessionController {
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getUnassignedStudents(
             @RequestParam(required = false) Long termId) {
         try {
-            List<StudentResponse> students = courseSessionService.getUnassignedStudents(termId);
+            List<StudentResponse> students = courseSessionControllerService.getUnassignedStudents(termId);
             return ResponseEntity.ok(ApiResponse.success(students));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
