@@ -157,18 +157,6 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## API Endpoints
-
-Refer to the generated Swagger/OpenAPI docs (if enabled) or Postman collection for complete list.
-
-Examples:
-
-* `POST /api/auth/register`
-* `POST /api/auth/login`
-* `GET /api/course-sessions`
-* `POST /api/appointments`
-
----
 
 ## Design Patterns
 
@@ -188,21 +176,10 @@ Examples:
 ## Future Enhancements
 
 * Real-time **Notifications** (WebSocket)
-* **Analytic Dashboard** (charts & reports)
-* **Payment Integration** (Stripe, PayPal)
+* **Analytic Dashboard** 
+* **Payment Integration**
 * **Mobile Client** (React Native / Flutter)
-* **Internationalization** (i18n)
-
----
-
-## Contributing
-
-1. Fork repository
-2. Create feature branch
-3. Commit & push changes
-4. Open Pull Request
-
-Please follow the existing code style and include tests where appropriate.
+* **Internationalization**
 
 ---
 
